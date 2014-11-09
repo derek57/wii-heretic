@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app>
+	<name>Chocolate HERETIC for Wii</name>
+	<coder>nitr8</coder>
+	<version>1.0</version> <release_date>10/22/2014</release_date> 
+<short_description>Port of Chocol. HERETIC to the Wii!</short_description>
+<long_description>Now you can play Raven Software's HERETIC chocolate style on your Wii!
+
+Compatible with the following IWAD's:
+
+- HERETIC BETA
+- HERETIC Shareware v1.0
+- HERETIC Shareware v1.2
+- HERETIC Registered v1.0
+- HERETIC Registered v1.2
+- HERETIC Registered v1.3 (Shadow of the Serpent Riders)
+
+Use the Wiimote to choose your IWAD.
+
+Press A to select the device / WAD file.
+Press B to go back in the menu.
+Use the cursors to scroll up / down in the list.
+Finally, press button 1 to load the game.
+
+Upon startup you have to be patient as the game checks
+the IWAD being loaded.
+
+This Wii-Release also includes PWAD loading possibilities.
+</long_description>
+</app>
