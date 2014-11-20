@@ -1172,7 +1172,16 @@ void D_DoomMain(void)
 	printf("  adding pspheretic.wad\n");
 
     if ((HERETIC_REG_1_0 || HERETIC_REG_1_2 || HERETIC_REG_1_3) && load_extra_wad == 1)
-	D_AddFile(extra_wad);
+    {
+	if(extra_wad_slot_1_loaded == 1)
+	    D_AddFile(extra_wad_1);
+
+	if(extra_wad_slot_2_loaded == 1)
+	    D_AddFile(extra_wad_2);
+
+	if(extra_wad_slot_3_loaded == 1)
+	    D_AddFile(extra_wad_3);
+    }
 
 //    W_ParseCommandLine();
 
