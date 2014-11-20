@@ -288,13 +288,17 @@ void Menu_FatDevice(void)
 	    printf("    |");
 	    printf("\n                                 |");
 	    printf("\n                                 |");
-	    printStyledText(7, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"IWAD: ");
+	    printStyledText(6, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"IWAD: ");
 	    printf("\n  L / R: Change device.          |"/*, 132*/);
-	    printStyledText(8, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD: ");
+	    printStyledText(7, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD1: ");
 	    printf("\n                                 |\n");
-	    printStyledText(9, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,".DEH: ");
-	    printf("\n  A: continue.                   |");
-	    printf("\n  Home: Quit.                    |\n");
+	    printStyledText(8, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD2: ");
+	    printf("\n                                 |\n");
+	    printStyledText(9, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD3: ");
+	    printf("\n  B: continue. / Home: Quit.     |");
+	    printf("\n                                 |\n");
+//	    printf("                      |\n");
+	    printStyledText(10, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,".DEH: ");
 	    printStyledText(11, 0,CONSOLE_FONT_BLACK,CONSOLE_FONT_WHITE,CONSOLE_FONT_BOLD,&stTexteLocation,"  ----------------------------------------------------------------------------  ");
 
 	    u32 buttons = WaitButtons();
@@ -346,14 +350,18 @@ void Menu_FatDevice(void)
     if (ret < 0)
     {
 	printf("\n                                 |");
-	printStyledText(7, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"IWAD: ");
+	printStyledText(6, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"IWAD: ");
 	printf("\n");
-	printStyledText(7, 0,CONSOLE_FONT_BLACK,CONSOLE_FONT_RED,CONSOLE_FONT_BOLD,&stTexteLocation,"  Error! (ret = %d)", ret);
+	printStyledText(6, 0,CONSOLE_FONT_BLACK,CONSOLE_FONT_RED,CONSOLE_FONT_BOLD,&stTexteLocation,"  Error! (ret = %d)", ret);
 	printf("              |");
 	printf("\n                                 |");
-	printStyledText(8, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD: ");
+	printStyledText(7, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD1: ");
 	printf("\n                                 |");
-	printStyledText(9, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,".DEH: ");
+	printStyledText(8, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD2: ");
+	printf("\n                                 |");
+	printStyledText(9, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD3: ");
+	printf("\n                                 |");
+	printStyledText(10, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,".DEH: ");
 
 	goto err;
     }
@@ -390,7 +398,9 @@ void Menu_WadList(void)
     char	deh_term[] = "Patch File for DeHackEd";
     char	str [100];
     char	stripped_target[MAXPATH] = "";
-    char	stripped_extra_wad[256] = "";
+    char	stripped_extra_wad_1[256] = "";
+    char	stripped_extra_wad_2[256] = "";
+    char	stripped_extra_wad_3[256] = "";
     char	stripped_dehacked_file[256] = "";
     char	*temp;
     char	*tmpPath = malloc (MAX_FILE_PATH_LEN);
@@ -400,7 +410,9 @@ void Menu_WadList(void)
 
     extern char	path_tmp[MAXPATH];
     extern char	target[MAXPATH];
-    extern char	extra_wad[256];
+    extern char	extra_wad_1[256];
+    extern char	extra_wad_2[256];
+    extern char	extra_wad_3[256];
     extern char	dehacked_file[256];
     extern char calculated_md5_string[33];
     extern char known_md5_string_heretic_beta_iwad[33];
@@ -415,6 +427,9 @@ void Menu_WadList(void)
     int		WADLoaded = 0;
     int		txtLoaded = 0;
 */
+    extern int	extra_wad_slot_1_loaded;
+    extern int	extra_wad_slot_2_loaded;
+    extern int	extra_wad_slot_3_loaded;
     extern int	fsize;
 /*
     extern int	fsizecq;
@@ -570,15 +585,21 @@ void Menu_WadList(void)
 		printStyledText(6, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_YELLOW,CONSOLE_FONT_BOLD,&stTexteLocation,"NO");
 	}
 
-	printStyledText(7, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"IWAD: ");
-	printStyledText(7, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_target);
+	printStyledText(6, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"IWAD: ");
+	printStyledText(6, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_target);
+	printStyledText(6, 33,CONSOLE_FONT_BLACK,CONSOLE_FONT_WHITE,CONSOLE_FONT_BOLD,&stTexteLocation,"|");
+	printStyledText(7, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD1: ");
+	printStyledText(7, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_extra_wad_1);
 	printStyledText(7, 33,CONSOLE_FONT_BLACK,CONSOLE_FONT_WHITE,CONSOLE_FONT_BOLD,&stTexteLocation,"|");
-	printStyledText(8, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD: ");
-	printStyledText(8, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_extra_wad);
+	printStyledText(8, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD2: ");
+	printStyledText(8, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_extra_wad_2);
 	printStyledText(8, 33,CONSOLE_FONT_BLACK,CONSOLE_FONT_WHITE,CONSOLE_FONT_BOLD,&stTexteLocation,"|");
-	printStyledText(9, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,".DEH: ");
-	printStyledText(9, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_dehacked_file);
+	printStyledText(9, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,"PWAD3: ");
+	printStyledText(9, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_extra_wad_3);
 	printStyledText(9, 33,CONSOLE_FONT_BLACK,CONSOLE_FONT_WHITE,CONSOLE_FONT_BOLD,&stTexteLocation,"|");
+	printStyledText(10, 35,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,".DEH: ");
+	printStyledText(10, 41,CONSOLE_FONT_BLACK,CONSOLE_FONT_GREEN,CONSOLE_FONT_BOLD,&stTexteLocation,stripped_dehacked_file);
+	printStyledText(10, 33,CONSOLE_FONT_BLACK,CONSOLE_FONT_WHITE,CONSOLE_FONT_BOLD,&stTexteLocation,"|");
 
 	printf("\n");
 
@@ -856,21 +877,64 @@ void Menu_WadList(void)
 			{
 			    load_extra_wad = 1;
 
-			    strcpy(extra_wad, check);
-			    strcpy(stripped_extra_wad, tmpFile->filename);
+			    strcpy(extra_wad_1, check);
+			    strcpy(stripped_extra_wad_1, tmpFile->filename);
+
+			    extra_wad_slot_1_loaded = 1;
+
+			    if(extra_wad_slot_1_loaded == 1)
+			    {
+				strcpy(extra_wad_2, check);
+				strcpy(stripped_extra_wad_2, tmpFile->filename);
+
+				extra_wad_slot_2_loaded = 1;
+			    }
+
+			    if(extra_wad_slot_2_loaded == 1)
+			    {
+				strcpy(extra_wad_3, check);
+				strcpy(stripped_extra_wad_3, tmpFile->filename);
+
+				extra_wad_slot_3_loaded = 1;
+			    }
 
 			    extra_wad_loaded = 1;
 
 //			    W_CheckSize(0);
 			}
-			else if (strncmp(pwad_term, temp, 4) == 0)
+			else if (strncmp(pwad_term, temp, 4) == 0 && extra_wad_slot_1_loaded == 0)
 			{
 			    load_extra_wad = 1;
 
-			    strcpy(extra_wad, check);
-			    strcpy(stripped_extra_wad, tmpFile->filename);
+			    strcpy(extra_wad_1, check);
+			    strcpy(stripped_extra_wad_1, tmpFile->filename);
 
-//			    W_CheckSize(3);
+			    extra_wad_slot_1_loaded = 1;
+
+			    extra_wad_loaded = 1;
+			}
+			else if (strncmp(pwad_term, temp, 4) == 0 && extra_wad_slot_1_loaded == 1
+								  && extra_wad_slot_2_loaded == 0)
+			{
+			    load_extra_wad = 1;
+
+			    strcpy(extra_wad_2, check);
+			    strcpy(stripped_extra_wad_2, tmpFile->filename);
+
+			    extra_wad_slot_2_loaded = 1;
+
+			    extra_wad_loaded = 1;
+			}
+			else if (strncmp(pwad_term, temp, 4) == 0 && extra_wad_slot_1_loaded == 1
+								  && extra_wad_slot_2_loaded == 1
+								  && extra_wad_slot_3_loaded == 0)
+			{
+			    load_extra_wad = 1;
+
+			    strcpy(extra_wad_3, check);
+			    strcpy(stripped_extra_wad_3, tmpFile->filename);
+
+			    extra_wad_slot_3_loaded = 1;
 
 			    extra_wad_loaded = 1;
 			}
@@ -888,7 +952,7 @@ void Menu_WadList(void)
 	}
 
 	/* B button */
-	if (buttons & WPAD_CLASSIC_BUTTON_B)
+	if (buttons & WPAD_CLASSIC_BUTTON_A)
 	{
 	    if(gDirLevel<=1)
 	    {
@@ -910,17 +974,21 @@ void Menu_WadList(void)
 	    goto getList;
 	}
 
-	if (buttons & WPAD_CLASSIC_BUTTON_A)
+	if (buttons & WPAD_CLASSIC_BUTTON_X)
 	{
 	    load_dehacked = 0;
 	    load_extra_wad = 0;
 
 	    strcpy(stripped_dehacked_file, "");
-	    strcpy(stripped_extra_wad, "");
+	    strcpy(stripped_extra_wad_1, "");
+	    strcpy(stripped_extra_wad_2, "");
+	    strcpy(stripped_extra_wad_3, "");
 	    strcpy(stripped_target, "");
 
 	    strcpy(dehacked_file, "");
-	    strcpy(extra_wad, "");
+	    strcpy(extra_wad_1, "");
+	    strcpy(extra_wad_2, "");
+	    strcpy(extra_wad_3, "");
 	    strcpy(target, "");
 	}
 

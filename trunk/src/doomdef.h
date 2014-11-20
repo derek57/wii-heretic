@@ -933,11 +933,16 @@ extern boolean		HERETIC_REG_1_0;
 extern boolean		HERETIC_REG_1_2;
 extern boolean		HERETIC_REG_1_3;
 
-char			extra_wad[256];
+char			extra_wad_1[256];
+char			extra_wad_2[256];
+char			extra_wad_3[256];
 char			target[MAXPATH];
 char			path_tmp[MAXPATH];
 char			dehacked_file[256];
 
+int			extra_wad_slot_1_loaded;
+int			extra_wad_slot_2_loaded;
+int			extra_wad_slot_3_loaded;
 int			load_extra_wad;
 
 FILE			*debugfile;
