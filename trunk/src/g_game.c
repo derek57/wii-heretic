@@ -210,16 +210,49 @@ int inventoryTics;
 
 int key_strafe;
 int mouselook;
+int joybstrafe;
 
-int	joybflyup = 0;
-int	joybflydown = 14;
-int     joybinvleft = 11;
-int     joybinvright = 10;
-int     joybinvuse = 2;
+int joy_a = 1;		// 0
+int joy_r = 2;		// 1
+int joy_plus = 4;	// 2
+int joy_l = 8;		// 3
+int joy_minus = 16;	// 4
+int joy_b = 32;		// 5
+int joy_left = 64;	// 6
+int joy_down = 128;	// 7
+int joy_right = 256;	// 8
+int joy_up = 512;	// 9
+int joy_zr = 1024;	// 10
+int joy_zl = 2048;	// 11
+int joy_home = 4096;	// 12
+int joy_x = 8192;	// 13
+int joy_y = 16384;	// 14
+
+int     joybinvright = 0;
 int     joybfire = 1;
+int     joybinvuse = 2;
 int     joybuse = 3;
-int     joybweapon = 9;
-int	joybstrafe;
+int	joybmenu = 4;
+int	joybflydown = 5;
+int     joybleft = 6;
+int	joybmap = 7;
+int	joybright = 8;
+int	joybcenter = 9;
+int	joybmapzoomout = 10;
+int	joybmapzoomin = 11;
+int	joybflyup = 13;
+int     joybinvleft = 14;
+
+extern fixed_t mtof_zoommul;    // how far the window zooms in each tic (map coords)
+extern fixed_t ftom_zoommul;    // how far the window zooms in each tic (fb coords)
+
+void AM_Start(void);
+void AM_Stop(void);
+
+extern boolean askforquit;
+extern boolean askforsave;
+extern  int typeofask;
+extern  int typeofask2;
 
 // haleyjd: removed WATCOMC
 
@@ -377,7 +410,7 @@ void ChangeInventoryItemRight(void)
 
     int k_inv = 0;
 
-    if(WPAD_ButtonsDown(0) & WPAD_CLASSIC_BUTTON_ZR)
+//    if(WPAD_ButtonsDown(0) & WPAD_CLASSIC_BUTTON_ZR)
     {
 	k_inv = 1; // Select right object
 	ev.data1 = ']';
@@ -397,7 +430,7 @@ void ChangeInventoryItemLeft(void)
 
     int k_inv = 0;
 
-    if(WPAD_ButtonsDown(0) & WPAD_CLASSIC_BUTTON_ZL)
+//    if(WPAD_ButtonsDown(0) & WPAD_CLASSIC_BUTTON_ZL)
     {
 	k_inv = 1; // Select right object
 	ev.data1 = '[';
@@ -683,6 +716,9 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
 */
     // haleyjd: removed externdriver crap
     
+    if(mouselook == 0)
+	look = TOCENTER;
+
     // Fly up/down/drop keys
     if (gamekeydown[key_flyup] || joybuttons[joybflyup])
     {
@@ -749,21 +785,103 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
 
     if(data->exp.type == WPAD_EXP_CLASSIC && !demoplayback)
     {
-	if(data->btns_d & WPAD_CLASSIC_BUTTON_RIGHT)
-	    ChangeWeaponRight();
+	if(data->btns_d)
+	{
+	    if(joybuttons[joybinvuse])
+	    {                           // flag to denote that it's okay to use an artifact
+		player_t *plr;
 
-	if(data->btns_d & WPAD_CLASSIC_BUTTON_LEFT)
-	    ChangeWeaponLeft();
+		plr = &players[consoleplayer];
 
-	if(data->btns_d & WPAD_CLASSIC_BUTTON_X || mouselook == 0)
-	    look = TOCENTER;
+	        if (!inventory)
+	        {
+	            plr->readyArtifact = plr->inventory[inv_ptr].type;
+	        }
+	        usearti = true;
+	    }
+
+	    if(joybuttons[joybmenu])
+	    {
+		if (!MenuActive)
+		    MN_ActivateMenu();
+		else
+		    MN_DeactivateMenu();
+
+		if (askforquit)
+		{
+		    askforquit = false;
+		    typeofask = 0;
+		    MN_DeactivateMenu();
+		}
+
+		if (askforsave)
+		{
+		    askforsave = false;
+		    typeofask2 = 0;
+		    MN_DeactivateMenu();
+		}
+	    }
+
+	    if(joybuttons[joybright])
+		ChangeWeaponRight();
+
+	    if(joybuttons[joybleft])
+		ChangeWeaponLeft();
+
+	    if(joybuttons[joybinvright])
+		ChangeInventoryItemRight();
+
+	    if (joybuttons[joybinvleft])
+		ChangeInventoryItemLeft();
+
+	    if(joybuttons[joybcenter])
+		look = TOCENTER;
+
+	    if(joybuttons[joybmap])
+	    {
+		if (!automapactive)
+		{
+		    if(!MenuActive)
+			AM_Start ();
+		}
+		else
+		{
+		    if(!MenuActive)
+		    {
+			AM_Stop ();
+
+			extern int screenblocks;
+
+			R_SetViewSize (screenblocks, detailLevel);
+		    }
+		}
+	    }
+
+	    if(automapactive)
+	    {
+		if(joybuttons[joybmapzoomin])
+		{
+		    mtof_zoommul = M_ZOOMIN;
+		    ftom_zoommul = M_ZOOMOUT;
+		}
+
+		if(joybuttons[joybmapzoomout])
+		{
+		    mtof_zoommul = M_ZOOMOUT;
+		    ftom_zoommul = M_ZOOMIN;
+		}
+	    }
+	}
     }
 
-    if (joybuttons[joybinvright] && !demoplayback) 
-	 ChangeInventoryItemRight();
-
-    if (joybuttons[joybinvleft] && !demoplayback) 
-	 ChangeInventoryItemLeft();
+    if(automapactive)
+    {
+	if(!(joybuttons[joybmapzoomin] || joybuttons[joybmapzoomout]))
+	{
+	    mtof_zoommul = FRACUNIT;
+	    ftom_zoommul = FRACUNIT;
+	}
+    }
 
     if (gamekeydown[key_use] || joybuttons[joybuse] /*|| mousebuttons[mousebuse]*/)
     {
@@ -1095,6 +1213,7 @@ boolean G_Responder(event_t * ev)
         }
         usearti = true;
     }
+
     if(ev->type == ev_joystick && ev->data1 == 4 && data->btns_d)
     {                           // flag to denote that it's okay to use an artifact
         if (!inventory)
@@ -1237,21 +1356,21 @@ boolean G_Responder(event_t * ev)
 
         case ev_joystick:
 //            SetJoyButtons(ev->data1);
-	    joybuttons[0] = (ev->data1 & 1) > 0;
-            joybuttons[1] = (ev->data1 & 2) > 0;
-            joybuttons[2] = (ev->data1 & 4) > 0;
-            joybuttons[3] = (ev->data1 & 8) > 0;
-            joybuttons[4] = (ev->data1 & 16) > 0;
-            joybuttons[5] = (ev->data1 & 32) > 0;
-            joybuttons[6] = (ev->data1 & 64) > 0;
-            joybuttons[7] = (ev->data1 & 128) > 0;
-            joybuttons[8] = (ev->data1 & 256) > 0;
-            joybuttons[9] = (ev->data1 & 512) > 0;
-            joybuttons[10] = (ev->data1 & 1024) > 0;
-            joybuttons[11] = (ev->data1 & 2048) > 0;
-            joybuttons[12] = (ev->data1 & 4096) > 0;
-            joybuttons[13] = (ev->data1 & 8192) > 0;
-            joybuttons[14] = (ev->data1 & 16384) > 0;
+	    joybuttons[0] = (ev->data1 & joy_a) > 0;
+	    joybuttons[1] = (ev->data1 & joy_r) > 0;
+	    joybuttons[2] = (ev->data1 & joy_plus) > 0;
+	    joybuttons[3] = (ev->data1 & joy_l) > 0;
+	    joybuttons[4] = (ev->data1 & joy_minus) > 0;
+	    joybuttons[5] = (ev->data1 & joy_b) > 0;
+	    joybuttons[6] = (ev->data1 & joy_left) > 0;
+	    joybuttons[7] = (ev->data1 & joy_down) > 0;
+	    joybuttons[8] = (ev->data1 & joy_right) > 0;
+	    joybuttons[9] = (ev->data1 & joy_up) > 0;
+	    joybuttons[10] = (ev->data1 & joy_zr) > 0;
+	    joybuttons[11] = (ev->data1 & joy_zl) > 0;
+	    joybuttons[12] = (ev->data1 & joy_home) > 0;
+	    joybuttons[13] = (ev->data1 & joy_x) > 0;
+	    joybuttons[14] = (ev->data1 & joy_y) > 0;
 	    joyxmove = ev->data2; 
 	    joyymove = ev->data3; 
             joyirx = ev->data4;
