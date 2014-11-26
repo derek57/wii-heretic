@@ -862,6 +862,10 @@ int MN_TextBWidth(char *text);
 
 #define DATE_AS_INT (((YEAR - 2000) * 12 + MONTH) * 31 + DAY)
 
+#define M_ZOOMIN        ((int) (1.02*FRACUNIT)) // goes to 2x in 1 second
+
+#define M_ZOOMOUT       ((int) (FRACUNIT/1.02)) // pulls out to 0.5x in 1 second
+
 typedef enum 
 {
     DEFAULT_INT,
