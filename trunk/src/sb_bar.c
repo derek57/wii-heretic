@@ -587,8 +587,12 @@ void SB_Drawer(void)
     CPlayer = &players[consoleplayer];
 
     if(!automapactive && !demoplayback && crosshair == 1)
-	V_DrawPatch(158, 82, PatchXHAIR);
-
+    {
+	if(screenblocks < 11)
+	    V_DrawPatch(158, 82, PatchXHAIR);
+	else
+	    V_DrawPatch(158, 98, PatchXHAIR);
+    }
     if (viewheight == SCREENHEIGHT && !automapactive)
     {
         DrawFullScreenStuff();
