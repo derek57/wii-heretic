@@ -65,6 +65,8 @@
 
 #include "deh_str.h"
 
+#include "m_misc.h"
+
 #define CT_KEY_GREEN    'g'
 #define CT_KEY_YELLOW   'y'
 #define CT_KEY_RED      'r'
@@ -125,7 +127,7 @@ int		fsize = 0;
 int		fsizerw = 0;
 int		resource_wad_exists = 0;
 
-//static void CreateSavePath(void);
+static void CreateSavePath(void);
 
 //---------------------------------------------------------------------------
 //
@@ -288,8 +290,11 @@ void D_DoomLoop(void)
 {
 
 //    if (M_CheckParm("-debugfile"))
-    if(debugmode)
-	debugfile = fopen("usb:/apps/wiiheretic/debug.txt","w");
+//    if(debugmode)
+	if(usb)
+	    debugfile = fopen("usb:/apps/wiiheretic/debug.txt","w");
+	else if(sd)
+	    debugfile = fopen("sd:/apps/wiiheretic/debug.txt","w");
 /*
     I_GraphicsCheckCommandLine();
     I_SetGrabMouseCallback(D_GrabMouseCallback);
@@ -868,10 +873,15 @@ static void D_Endoom(void)
 void W_CheckSize(/*int wad*/void);
 void I_QuitSerialFail (void);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+
 void D_DoomMain(void)
 {
-    GameMission_t gamemission = heretic;
+    FILE *fprw;
 /*
+    GameMission_t gamemission = heretic;
+
     int p;
     char file[256];
 
@@ -882,7 +892,10 @@ void D_DoomMain(void)
 
 //    W_CheckSize(0);
 
-    FILE *fprw = fopen("usb:/apps/wiiheretic/pspheretic.wad","rb");
+    if(usb)
+	fprw = fopen("usb:/apps/wiiheretic/pspheretic.wad","rb");
+    else if(sd)
+	fprw = fopen("sd:/apps/wiiheretic/pspheretic.wad","rb");
 
     if(fprw)
     {
@@ -1162,11 +1175,19 @@ void D_DoomMain(void)
     }
 */
     if(debugmode)
-	D_AddFile("usb:/apps/wiiheretic/IWAD/Reg10/HERETIC.WAD");
+    {
+	if(usb)
+	    D_AddFile("usb:/apps/wiiheretic/IWAD/Reg10/HERETIC.WAD");
+	else if(sd)
+	    D_AddFile("sd:/apps/wiiheretic/IWAD/Reg10/HERETIC.WAD");
+    }
     else
 	D_AddFile(target);
 
-    D_AddFile("usb:/apps/wiiheretic/pspheretic.wad");
+    if(usb)
+	D_AddFile("usb:/apps/wiiheretic/pspheretic.wad");
+    else if(sd)
+	D_AddFile("sd:/apps/wiiheretic/pspheretic.wad");
 
     if (debugmode && (HERETIC_REG_1_0 || HERETIC_REG_1_2 || HERETIC_REG_1_3))
 	printf("  adding pspheretic.wad\n");
@@ -1235,13 +1256,17 @@ void D_DoomMain(void)
     }
 
     I_SetWindowTitle(gamedescription);
-*/
+
     savegamedir = M_GetSaveGameDir(D_SaveGameIWADName(gamemission));
-/*
+*/
+    savegamedir = M_GetSaveGameDir("heretic.wad");
+
+//    printf("savegamedir: %s\n",savegamedir);	// ONLY FOR DEBUGGING
+
     // Now that the savedir is loaded from .CFG, make sure it exists
 
     CreateSavePath();
-
+/*
     I_PrintStartupBanner(gamedescription);
 
     if (M_ParmExists("-testcontrols"))
@@ -1434,34 +1459,54 @@ void D_DoomMain(void)
 // CreateSavePath
 //
 //==========================================================================
-/*
+
 static void CreateSavePath(void)
 {
     char creationPath[121];
 
 //    creationRoot[120] = 0;
 
-    if(HERETIC_BETA)
-	strcpy(creationPath, SavePathBeta);
+    if(usb)
+    {
+	if(HERETIC_BETA)
+	    strcpy(creationPath, SavePathBetaUSB);
 
-    if(HERETIC_SHARE_1_0)
-	strcpy(creationPath, SavePathShare10);
+	if(HERETIC_SHARE_1_0)
+	    strcpy(creationPath, SavePathShare10USB);
 
-    if(HERETIC_SHARE_1_2)
-	strcpy(creationPath, SavePathShare12);
+	if(HERETIC_SHARE_1_2)
+	    strcpy(creationPath, SavePathShare12USB);
 
-    if(HERETIC_REG_1_0)
-	strcpy(creationPath, SavePathReg10);
+	if(HERETIC_REG_1_0)
+	    strcpy(creationPath, SavePathReg10USB);
 
-    if(HERETIC_REG_1_2)
-	strcpy(creationPath, SavePathReg12);
+	if(HERETIC_REG_1_2)
+	    strcpy(creationPath, SavePathReg12USB);
 
-    if(HERETIC_REG_1_3)
-	strcpy(creationPath, SavePathReg13);
+	if(HERETIC_REG_1_3)
+	    strcpy(creationPath, SavePathReg13USB);
+    }
+    else if(sd)
+    {
+	if(HERETIC_BETA)
+	    strcpy(creationPath, SavePathBetaSD);
 
-//    creationPath[120] = 0;
+	if(HERETIC_SHARE_1_0)
+	    strcpy(creationPath, SavePathShare10SD);
 
-    mkdir( creationPath, S_IRWXU|S_IRWXG|S_IRWXO );
-//    M_MakeDirectory(creationPath);
+	if(HERETIC_SHARE_1_2)
+	    strcpy(creationPath, SavePathShare12SD);
+
+	if(HERETIC_REG_1_0)
+	    strcpy(creationPath, SavePathReg10SD);
+
+	if(HERETIC_REG_1_2)
+	    strcpy(creationPath, SavePathReg12SD);
+
+	if(HERETIC_REG_1_3)
+	    strcpy(creationPath, SavePathReg13SD);
+    }
+
+    M_MakeDirectory(creationPath);
 }
-*/
+

@@ -57,23 +57,46 @@ char *SV_Filename(int slot)
 
     filename = malloc(strlen(savegamedir) + strlen(SAVEGAMENAME) + 8);
 
-    if(HERETIC_BETA)
-	sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathBeta, slot);
+    if(usb)
+    {
+	if(HERETIC_BETA)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathBetaUSB, slot);
 
-    if(HERETIC_SHARE_1_0)
-	sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathShare10, slot);
+	if(HERETIC_SHARE_1_0)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathShare10USB, slot);
 
-    if(HERETIC_SHARE_1_2)
-	sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathShare12, slot);
+	if(HERETIC_SHARE_1_2)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathShare12USB, slot);
 
-    if(HERETIC_REG_1_0)
-	sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg10, slot);
+	if(HERETIC_REG_1_0)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg10USB, slot);
 
-    if(HERETIC_REG_1_2)
-	sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg12, slot);
+	if(HERETIC_REG_1_2)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg12USB, slot);
 
-    if(HERETIC_REG_1_3)
-	sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg13, slot);
+	if(HERETIC_REG_1_3)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg13USB, slot);
+    }
+    else if(sd)
+    {
+	if(HERETIC_BETA)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathBetaSD, slot);
+
+	if(HERETIC_SHARE_1_0)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathShare10SD, slot);
+
+	if(HERETIC_SHARE_1_2)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathShare12SD, slot);
+
+	if(HERETIC_REG_1_0)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg10SD, slot);
+
+	if(HERETIC_REG_1_2)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg12SD, slot);
+
+	if(HERETIC_REG_1_3)
+	    sprintf(filename, "%s/" SAVEGAMENAME "%d.hsg", SavePathReg13SD, slot);
+    }
 
     return filename;
 }

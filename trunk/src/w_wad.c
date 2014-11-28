@@ -615,13 +615,20 @@ void W_CheckCorrectIWAD(GameMission_t mission)
     }
 }
 */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+
 void W_CheckSize(/*int wad**/void)
 {
 //    if(wad == 0)
     {
 	FILE *fp;
 
-	fp = fopen("usb:/apps/wiihexen/pspheretic.wad", "r");
+	if(usb)
+	    fp = fopen("usb:/apps/wiihexen/pspheretic.wad", "r");
+	else if(sd)
+	    fp = fopen("sd:/apps/wiihexen/pspheretic.wad", "r");
 
 	if (fp == NULL)
 	    printf(" ");

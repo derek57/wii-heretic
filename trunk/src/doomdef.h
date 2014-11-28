@@ -835,13 +835,22 @@ int MN_TextBWidth(char *text);
 
 #define MAXPATH		0x108
 
-#define SavePathRoot "usb:/apps/wiiheretic/savegames/heretic.wad"
-#define SavePathBeta "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_BETA"
-#define SavePathShare10 "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_S_10"
-#define SavePathShare12 "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_S_12"
-#define SavePathReg10 "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_10"
-#define SavePathReg12 "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_12"
-#define SavePathReg13 "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_13"
+#define SavePathRoot1USB "usb:/apps/wiiheretic/savegames"
+#define SavePathRoot2USB "usb:/apps/wiiheretic/savegames/heretic.wad"
+#define SavePathBetaUSB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_BETA"
+#define SavePathShare10USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_S_10"
+#define SavePathShare12USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_S_12"
+#define SavePathReg10USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_10"
+#define SavePathReg12USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_12"
+#define SavePathReg13USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_13"
+#define SavePathRoot1SD "sd:/apps/wiiheretic/savegames"
+#define SavePathRoot2SD "sd:/apps/wiiheretic/savegames/heretic.wad"
+#define SavePathBetaSD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_BETA"
+#define SavePathShare10SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_S_10"
+#define SavePathShare12SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_S_12"
+#define SavePathReg10SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_R_10"
+#define SavePathReg12SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_R_12"
+#define SavePathReg13SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_R_13"
 
 #define YEAR ((/*((__DATE__ [7] - '0') * 10 + (__DATE__ [8] - '0')) * 10 \
                +*/ (__DATE__ [9] - '0')) * 10 + (__DATE__ [10] - '0'))
@@ -865,6 +874,9 @@ int MN_TextBWidth(char *text);
 #define M_ZOOMIN        ((int) (1.02*FRACUNIT)) // goes to 2x in 1 second
 
 #define M_ZOOMOUT       ((int) (FRACUNIT/1.02)) // pulls out to 0.5x in 1 second
+
+extern boolean sd;
+extern boolean usb;
 
 typedef enum 
 {

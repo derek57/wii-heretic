@@ -809,13 +809,28 @@ void S_StartMP3Music(int type, int mode)
     }
 
     if(!forced)
-	sprintf(path, "usb:/apps/wiiheretic/music/song%i.ogg", currentsong);
+    {
+	if(usb)
+	    sprintf(path, "usb:/apps/wiiheretic/music/song%i.ogg", currentsong);
+	else if(sd)
+	    sprintf(path, "sd:/apps/wiiheretic/music/song%i.ogg", currentsong);
+    }
     else
     {
 	if(fake)
-	    sprintf(path, "usb:/apps/wiiheretic/music/song%i.ogg", faketracknum);
+	{
+	    if(usb)
+		sprintf(path, "usb:/apps/wiiheretic/music/song%i.ogg", faketracknum);
+	    else if(sd)
+		sprintf(path, "sd:/apps/wiiheretic/music/song%i.ogg", faketracknum);
+	}
 	else
-	    sprintf(path, "usb:/apps/wiiheretic/music/song%i.ogg", tracknum);
+	{
+	    if(usb)
+		sprintf(path, "usb:/apps/wiiheretic/music/song%i.ogg", tracknum);
+	    else if(sd)
+		sprintf(path, "sd:/apps/wiiheretic/music/song%i.ogg", tracknum);
+	}
     }
 				// FIXME: THIS PRINTF FIXES A BUG WHEN USING MP3 "CHOOSE TRACK" FROM
     printf("",tracknum);	// WITHIN THE MAIN MENU. WHILE THIS COMMAND IS NOT REQUIRED FOR WIIDOOM,

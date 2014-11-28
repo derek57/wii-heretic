@@ -2178,6 +2178,9 @@ float M_GetFloatVariable(char *name)
 // Get the path to the default configuration dir to use, if NULL
 // is passed to M_SetConfigDir.
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+
 static char *GetDefaultConfigDir(void)
 {
 
@@ -2210,7 +2213,10 @@ static char *GetDefaultConfigDir(void)
 	if(debugmode)
 	    printf("FROM M_CONFIG.O: HOME-DIR IS: %s\n", homedir);
 */
-        return strdup("usb:/apps/wiiheretic/");
+	if(usb)
+	    return strdup("usb:/apps/wiiheretic/");
+	else if(sd)
+	    return strdup("sd:/apps/wiiheretic/");
     }
 }
 
@@ -2254,7 +2260,6 @@ char *M_GetSaveGameDir(char *iwadname)
 {
     char *savegamedir = NULL;
     char *savegameroot;
-    char *topdir;
 
     // If not "doing" a configuration directory (Windows), don't "do"
     // a savegame directory, either.
@@ -2265,35 +2270,72 @@ char *M_GetSaveGameDir(char *iwadname)
     }
     else
     {
-        // ~/.chocolate-doom/savegames
+        // ~/.chocolate-doom/savegames/
 
-        topdir = M_StringJoin(configdir, "savegames", NULL);
-        M_MakeDirectory(topdir);
+        savegamedir = malloc(strlen(configdir) + 30);
+        sprintf(savegamedir, "%ssavegames%c", configdir,
+                             DIR_SEPARATOR);
+
+        M_MakeDirectory(savegamedir);
 
         // eg. ~/.chocolate-doom/savegames/doom2.wad/
-/*
-        savegamedir = M_StringJoin(topdir, DIR_SEPARATOR_S, iwadname,
-                                   DIR_SEPARATOR_S, NULL);
-*/
-	savegameroot = SavePathRoot;
-	M_MakeDirectory(savegameroot);
 
-	if(fsize == 4095992)
-	    savegamedir = SavePathBeta;
-	else if(fsize == 5120300)
-	    savegamedir = SavePathShare10;
-	else if(fsize == 5120920)
-	    savegamedir = SavePathShare12;
-	else if(fsize == 11096488)
-	    savegamedir = SavePathReg10;
-	else if(fsize == 11095516)
-	    savegamedir = SavePathReg12;
-	else if(fsize == 14189976)
-	    savegamedir = SavePathReg13;
+        sprintf(savegamedir + strlen(savegamedir), "%s%c",
+                iwadname, DIR_SEPARATOR);
+
+	if(usb)
+	{
+	    savegameroot = SavePathRoot1USB;
+
+	    M_MakeDirectory(savegameroot);
+
+	    savegameroot = SavePathRoot2USB;
+
+	    M_MakeDirectory(savegameroot);
+	}
+	else if(sd)
+	{
+	    savegameroot = SavePathRoot1SD;
+
+	    M_MakeDirectory(savegameroot);
+
+	    savegameroot = SavePathRoot2SD;
+
+	    M_MakeDirectory(savegameroot);
+	}
+
+	if(usb)
+	{
+	    if(fsize == 4095992)
+		savegamedir = SavePathBetaUSB;
+	    else if(fsize == 5120300)
+		savegamedir = SavePathShare10USB;
+	    else if(fsize == 5120920)
+		savegamedir = SavePathShare12USB;
+	    else if(fsize == 11096488)
+		    savegamedir = SavePathReg10USB;
+	    else if(fsize == 11095516)
+		savegamedir = SavePathReg12USB;
+	    else if(fsize == 14189976)
+		savegamedir = SavePathReg13USB;
+	}
+	else if(sd)
+	{
+	    if(fsize == 4095992)
+		savegamedir = SavePathBetaSD;
+	    else if(fsize == 5120300)
+		savegamedir = SavePathShare10SD;
+	    else if(fsize == 5120920)
+		savegamedir = SavePathShare12SD;
+	    else if(fsize == 11096488)
+		    savegamedir = SavePathReg10SD;
+	    else if(fsize == 11095516)
+		savegamedir = SavePathReg12SD;
+	    else if(fsize == 14189976)
+		savegamedir = SavePathReg13SD;
+	}
 
 	M_MakeDirectory(savegamedir);
-
-        free(topdir);
     }
 
     return savegamedir;
