@@ -321,8 +321,8 @@ int repisode = 1;
 int rmap = 1;
 int rskill = 0;
 
-int key_bindings_start_in_cfg_at_pos = 17;
-int key_bindings_end_in_cfg_at_pos = 31;
+int key_bindings_start_in_cfg_at_pos = 18;
+int key_bindings_end_in_cfg_at_pos = 32;
 /*
 int memory_info = 0;
 int battery_info = 0;
@@ -2187,7 +2187,6 @@ static void ClearControls (int cctrlskey)
 
 static void ClearKeys (int option)
 {
-    *doom_defaults_list[17].location = 0;
     *doom_defaults_list[18].location = 0;
     *doom_defaults_list[19].location = 0;
     *doom_defaults_list[20].location = 0;
@@ -2201,24 +2200,25 @@ static void ClearKeys (int option)
     *doom_defaults_list[28].location = 0;
     *doom_defaults_list[29].location = 0;
     *doom_defaults_list[30].location = 0;
+    *doom_defaults_list[31].location = 0;
 }
 
 static void ResetKeys (int option)
 {
-    *doom_defaults_list[17].location = CLASSIC_CONTROLLER_R;
-    *doom_defaults_list[18].location = CLASSIC_CONTROLLER_L;
-    *doom_defaults_list[19].location = CLASSIC_CONTROLLER_MINUS;
-    *doom_defaults_list[20].location = CLASSIC_CONTROLLER_LEFT;
-    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_DOWN;
-    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_RIGHT;
-    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_ZL;
-    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_ZR;
-    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_Y;
-    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_A;
-    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_PLUS;
-    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_X;
-    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_B;
-    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_UP;
+    *doom_defaults_list[18].location = CLASSIC_CONTROLLER_R;
+    *doom_defaults_list[19].location = CLASSIC_CONTROLLER_L;
+    *doom_defaults_list[20].location = CLASSIC_CONTROLLER_MINUS;
+    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_LEFT;
+    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_DOWN;
+    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_RIGHT;
+    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_ZL;
+    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_ZR;
+    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_Y;
+    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_A;
+    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_PLUS;
+    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_X;
+    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_B;
+    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_UP;
 }
 
 //---------------------------------------------------------------------------
@@ -2518,7 +2518,7 @@ boolean MN_Responder(event_t * event)
     if (askforkey && data->btns_d)		// KEY BINDINGS
     {
 	ClearControls(event->data1);
-	*doom_defaults_list[keyaskedfor + 17 + FirstKey].location = event->data1;
+	*doom_defaults_list[keyaskedfor + 18 + FirstKey].location = event->data1;
 	askforkey = false;
 	return true;
     }
@@ -2933,7 +2933,7 @@ boolean MN_Responder(event_t * event)
 		{
 		    if (FirstKey == 0)
 		    {
-			CurrentItPos = 17; // End of Key menu (14 == 15 (max lines on a page) - 1)
+			CurrentItPos = 18; // End of Key menu (14 == 15 (max lines on a page) - 1)
 			FirstKey = FIRSTKEY_MAX;
 		    }
 		    else
@@ -3546,7 +3546,7 @@ static void DrawBindingsMenu(void)
 	if (askforkey && keyaskedfor == ctrls)
 	    MN_DrTextA("???", 195, (ctrls*10+20));
 	else
-	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+17].location)),195,(ctrls*10+20));
+	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+18].location)),195,(ctrls*10+20));
     }
 
 /*
