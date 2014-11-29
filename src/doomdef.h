@@ -479,6 +479,7 @@ typedef struct player_s
     mobj_t *rain1;              // active rain maker 1
     mobj_t *rain2;              // active rain maker 2
 
+    unsigned int jumpTics;      // delay the next jump for a moment
     unsigned int worldTimer;    // total time the player's been playing
 } player_t;
 
@@ -488,6 +489,7 @@ typedef struct player_s
 
 //#define	SBARHEIGHT	42      // status bar height at bottom of screen	// CHANGED FOR HIRES
 #define	SBARHEIGHT	(42 << hires)      // status bar height at bottom of screen	// CHANGED FOR HIRES
+#define AFLAG_JUMP			0x80
 
 #define NUMKEYS 256
 boolean gamekeydown[NUMKEYS];
@@ -963,6 +965,7 @@ int			load_extra_wad;
 
 FILE			*debugfile;
 
+boolean			jumping;
 boolean			error_detected;
 boolean			dont_move_forwards;
 boolean			print_resource_pwad_error;
