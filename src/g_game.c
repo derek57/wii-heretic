@@ -470,7 +470,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
     int look, arti;
     int flyheight;
 
-    extern boolean noartiskip;
+//    extern boolean noartiskip;
 
     // haleyjd: removed externdriver crap
 
@@ -735,7 +735,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
         // haleyjd: removed externdriver crap
         look = TOCENTER;
     }
-*/
+
     // Use artifact key
     if (gamekeydown[key_useartifact] || joybuttons[joybinvuse])
     {
@@ -765,6 +765,7 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
             }
         }
     }
+*/
     if (gamekeydown[127] && !cmd->arti
         && !players[consoleplayer].powers[pw_weaponlevel2])
     {
@@ -787,17 +788,22 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
     {
 	if(data->btns_d)
 	{
+
 	    if(joybuttons[joybinvuse])
 	    {                           // flag to denote that it's okay to use an artifact
-		player_t *plr;
-
-		plr = &players[consoleplayer];
-
-	        if (!inventory)
-	        {
-	            plr->readyArtifact = plr->inventory[inv_ptr].type;
-	        }
-	        usearti = true;
+		if (inventory)
+		{
+		    players[consoleplayer].readyArtifact =
+			    players[consoleplayer].inventory[inv_ptr].type;
+		    inventory = false;
+		    cmd->arti = 0;
+		    usearti = false;
+		}
+		else /*if (usearti)*/
+		{
+		    cmd->arti = players[consoleplayer].inventory[inv_ptr].type;
+		    usearti = false;
+		}
 	    }
 
 	    if(joybuttons[joybmenu])
@@ -1200,11 +1206,12 @@ static void SetJoyButtons(unsigned int buttons_mask)
 
 boolean G_Responder(event_t * ev)
 {
-    WPADData *data = WPAD_Data(0);
+//    WPADData *data = WPAD_Data(0);
 
     player_t *plr;
 
     plr = &players[consoleplayer];
+/*
     if (ev->type == ev_keyup && ev->data1 == key_useartifact)
     {                           // flag to denote that it's okay to use an artifact
         if (!inventory)
@@ -1223,7 +1230,7 @@ boolean G_Responder(event_t * ev)
         usearti = true;
     }
     // Check for spy mode player cycle
-/*
+
     if (gamestate == GS_LEVEL && ev->type == ev_keydown
         && ev->data1 == KEY_F12 && !deathmatch)
     {                           // Cycle the display player
