@@ -552,6 +552,11 @@ void P_ZMovement(mobj_t * mo)
         mo->z = mo->floorz;
         if (mo->momz < 0)
         {
+	    if(jumping)
+	    {
+		if (mo->player)
+		    mo->player->jumpTics = 7;       // delay any jumping for a short time
+	    }
             if (mo->player && mo->momz < -GRAVITY * 8 && !(mo->flags2 & MF2_FLY))       // squat down
             {
                 mo->player->deltaviewheight = mo->momz >> 3;

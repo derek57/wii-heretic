@@ -176,6 +176,7 @@ extern int key_invright, key_invuse;
     CONFIG_VARIABLE_INT		(vanilla_weapon_change),
     CONFIG_VARIABLE_INT		(wii_light),
     CONFIG_VARIABLE_INT		(xhair),
+    CONFIG_VARIABLE_INT		(jump),
     CONFIG_VARIABLE_INT		(key_fire),
     CONFIG_VARIABLE_INT		(key_use),
     CONFIG_VARIABLE_INT		(key_menu),
@@ -190,6 +191,7 @@ extern int key_invright, key_invuse;
     CONFIG_VARIABLE_INT		(key_fly_up),
     CONFIG_VARIABLE_INT		(key_fly_down),
     CONFIG_VARIABLE_INT		(key_look_center),
+    CONFIG_VARIABLE_INT		(key_jump),
 /*
 #ifdef FEATURE_SOUND
 

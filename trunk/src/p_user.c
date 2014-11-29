@@ -574,6 +574,15 @@ void P_PlayerThink(player_t * player)
         P_DeathThink(player);
         return;
     }
+
+    if(jumping)
+    {
+	if (player->jumpTics)
+	{
+	    player->jumpTics--;
+	}
+    }
+
     if (player->chickenTics)
     {
         P_ChickenPlayerThink(player);
@@ -594,6 +603,22 @@ void P_PlayerThink(player_t * player)
     }
     if (cmd->arti)
     {                           // Use an artifact
+	if(jumping)
+	{
+    	    if ((cmd->arti & AFLAG_JUMP) && onground && !player->jumpTics)
+    	    {
+            	if (player->chickenTics)
+            	{
+            	    player->mo->momz = 6 * FRACUNIT;
+            	}
+            	else
+            	{
+            	    player->mo->momz = 9 * FRACUNIT;
+            	}
+            	player->mo->flags2 &= ~MF2_ONMOBJ;
+            	player->jumpTics = 18;
+    	    }
+	}
         if (cmd->arti == 0xff)
         {
             P_PlayerNextArtifact(player);

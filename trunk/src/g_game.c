@@ -240,6 +240,7 @@ int	joybright = 8;
 int	joybcenter = 9;
 int	joybmapzoomout = 10;
 int	joybmapzoomin = 11;
+int	joybjump = 12;
 int	joybflyup = 13;
 int     joybinvleft = 14;
 
@@ -771,6 +772,12 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
     {
         gamekeydown[127] = false;
         cmd->arti = arti_tomeofpower;
+    }
+
+    if (/*gamekeydown[key_jump] || mousebuttons[mousebjump]
+	||*/ joybuttons[joybjump] && !MenuActive)
+    {
+	cmd->arti |= AFLAG_JUMP;
     }
 
 //

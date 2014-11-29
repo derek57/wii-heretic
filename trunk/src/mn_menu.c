@@ -151,6 +151,7 @@ static void SCBrightness(int option);
 static void SCDetails(int option);
 static void SCWeaponChange(int option);
 static void SCCrosshair(int option);
+static void SCJumping(int option);
 static void SCStats(int option);
 static void SCMouselook(int option);
 
@@ -321,8 +322,8 @@ int repisode = 1;
 int rmap = 1;
 int rskill = 0;
 
-int key_bindings_start_in_cfg_at_pos = 18;
-int key_bindings_end_in_cfg_at_pos = 32;
+int key_bindings_start_in_cfg_at_pos = 19;
+int key_bindings_end_in_cfg_at_pos = 34;
 /*
 int memory_info = 0;
 int battery_info = 0;
@@ -788,17 +789,18 @@ static MenuItem_t BindingsItems[] = {
     {ITT_SETKEY, "FLY UP", SCSetKey, 11, MENU_NONE},
     {ITT_SETKEY, "FLY DOWN", SCSetKey, 12, MENU_NONE},
     {ITT_SETKEY, "LOOK CENTER", SCSetKey, 13, MENU_NONE},
+    {ITT_SETKEY, "JUMP", SCSetKey, 14, MENU_NONE},
 //    {ITT_EMPTY, NULL, NULL, 11, MENU_NONE},
 //    {ITT_LRFUNC, "BUTTON LAYOUT :", ButtonLayout, 12, MENU_NONE},
-    {ITT_EMPTY, NULL, NULL, 14, MENU_NONE},
-    {ITT_SETKEY, "CLEAR ALL CONTROLS", ClearKeys, 15, MENU_NONE},
-    {ITT_SETKEY, "RESET TO DEFAULTS", ResetKeys, 16, MENU_NONE}
+    {ITT_EMPTY, NULL, NULL, 15, MENU_NONE},
+    {ITT_SETKEY, "CLEAR ALL CONTROLS", ClearKeys, 16, MENU_NONE},
+    {ITT_SETKEY, "RESET TO DEFAULTS", ResetKeys, 17, MENU_NONE}
 };
 
 static Menu_t BindingsMenu = {
-    40, 20,
+    40, 10,
     DrawBindingsMenu,
-    17, BindingsItems,
+    18, BindingsItems,
     0,
     MENU_BINDINGS
 };
@@ -851,13 +853,14 @@ static MenuItem_t GameItems[] = {
     {},
     {ITT_EFUNC, "MESSAGES", SCMessages, 0, MENU_NONE},
     {ITT_EFUNC, "CROSSHAIR", SCCrosshair, 0, MENU_NONE},
+    {ITT_EFUNC, "JUMPING", SCJumping, 0, MENU_NONE},
     {ITT_EFUNC, "WEAPON CHANGE", SCWeaponChange, 0, MENU_NONE}
 };
 
 static Menu_t GameMenu = {
     50, 10,
     DrawGameMenu,
-    8, GameItems,
+    9, GameItems,
     0,
     MENU_GAME
 };
@@ -1719,10 +1722,15 @@ static void DrawGameMenu(void)
     else
 	MN_DrTextB("OFF", 245, 130);
 
-    if(use_vanilla_weapon_change)
-	MN_DrTextB("SLOW", 245, 150);
+    if(jumping)
+	MN_DrTextB("ON", 245, 150);
     else
-	MN_DrTextB("FAST", 245, 150);
+	MN_DrTextB("OFF", 245, 150);
+
+    if(use_vanilla_weapon_change)
+	MN_DrTextB("SLOW", 245, 170);
+    else
+	MN_DrTextB("FAST", 245, 170);
 
     SB_state = -1;
     UpdateState |= I_FULLSCRN;
@@ -2187,7 +2195,6 @@ static void ClearControls (int cctrlskey)
 
 static void ClearKeys (int option)
 {
-    *doom_defaults_list[18].location = 0;
     *doom_defaults_list[19].location = 0;
     *doom_defaults_list[20].location = 0;
     *doom_defaults_list[21].location = 0;
@@ -2201,24 +2208,27 @@ static void ClearKeys (int option)
     *doom_defaults_list[29].location = 0;
     *doom_defaults_list[30].location = 0;
     *doom_defaults_list[31].location = 0;
+    *doom_defaults_list[32].location = 0;
+    *doom_defaults_list[33].location = 0;
 }
 
 static void ResetKeys (int option)
 {
-    *doom_defaults_list[18].location = CLASSIC_CONTROLLER_R;
-    *doom_defaults_list[19].location = CLASSIC_CONTROLLER_L;
-    *doom_defaults_list[20].location = CLASSIC_CONTROLLER_MINUS;
-    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_LEFT;
-    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_DOWN;
-    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_RIGHT;
-    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_ZL;
-    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_ZR;
-    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_Y;
-    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_A;
-    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_PLUS;
-    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_X;
-    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_B;
-    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_UP;
+    *doom_defaults_list[19].location = CLASSIC_CONTROLLER_R;
+    *doom_defaults_list[20].location = CLASSIC_CONTROLLER_L;
+    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_MINUS;
+    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_LEFT;
+    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_DOWN;
+    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_RIGHT;
+    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_ZL;
+    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_ZR;
+    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_Y;
+    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_A;
+    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_PLUS;
+    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_X;
+    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_B;
+    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_UP;
+    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_HOME;
 }
 
 //---------------------------------------------------------------------------
@@ -2518,7 +2528,7 @@ boolean MN_Responder(event_t * event)
     if (askforkey && data->btns_d)		// KEY BINDINGS
     {
 	ClearControls(event->data1);
-	*doom_defaults_list[keyaskedfor + 18 + FirstKey].location = event->data1;
+	*doom_defaults_list[keyaskedfor + 19 + FirstKey].location = event->data1;
 	askforkey = false;
 	return true;
     }
@@ -2933,7 +2943,7 @@ boolean MN_Responder(event_t * event)
 		{
 		    if (FirstKey == 0)
 		    {
-			CurrentItPos = 18; // End of Key menu (14 == 15 (max lines on a page) - 1)
+			CurrentItPos = 19; // End of Key menu (14 == 15 (max lines on a page) - 1)
 			FirstKey = FIRSTKEY_MAX;
 		    }
 		    else
@@ -3541,12 +3551,12 @@ static void DrawBindingsMenu(void)
 {
     int ctrls;
 
-    for (ctrls = 0; ctrls < 14; ctrls++)
+    for (ctrls = 0; ctrls < 15; ctrls++)
     {
 	if (askforkey && keyaskedfor == ctrls)
-	    MN_DrTextA("???", 195, (ctrls*10+20));
+	    MN_DrTextA("???", 195, (ctrls*10+10));
 	else
-	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+18].location)),195,(ctrls*10+20));
+	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+19].location)),195,(ctrls*10+10));
     }
 
 /*
@@ -3749,6 +3759,14 @@ static void SCCrosshair(int option)
 	crosshair++;
     else if(crosshair)
 	crosshair--;
+}
+
+static void SCJumping(int option)
+{
+    if(jumping == false)
+	jumping = true;
+    else if(jumping)
+	jumping = false;
 }
 
 static void SCCoords(int option)

@@ -351,6 +351,7 @@ void M_BindBaseControls(void)
     M_BindVariable("vanilla_weapon_change",  &use_vanilla_weapon_change);
     M_BindVariable("wii_light",              &wiilight);
     M_BindVariable("xhair",                  &crosshair);
+    M_BindVariable("jump",                   &jumping);
     M_BindVariable("key_fire",               &joy_r);
     M_BindVariable("key_use",                &joy_l);
     M_BindVariable("key_menu",               &joy_minus);
@@ -365,6 +366,7 @@ void M_BindBaseControls(void)
     M_BindVariable("key_fly_up",             &joy_x);
     M_BindVariable("key_fly_down",           &joy_b);
     M_BindVariable("key_look_center",        &joy_up);
+    M_BindVariable("key_jump",               &joy_home);
 /*
     M_BindVariable("use_mouse",                 &usemouse);
     M_BindVariable("key_invDrop",        &key_invdrop);
