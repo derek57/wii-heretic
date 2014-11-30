@@ -626,9 +626,9 @@ void W_CheckSize(/*int wad**/void)
 	FILE *fp;
 
 	if(usb)
-	    fp = fopen("usb:/apps/wiihexen/pspheretic.wad", "r");
+	    fp = fopen("usb:/apps/wiiheretic/pspheretic.wad", "r");
 	else if(sd)
-	    fp = fopen("sd:/apps/wiihexen/pspheretic.wad", "r");
+	    fp = fopen("sd:/apps/wiiheretic/pspheretic.wad", "r");
 
 	if (fp == NULL)
 	    printf(" ");
