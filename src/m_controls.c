@@ -313,6 +313,8 @@ extern int joy_a;
 extern int joy_b;
 extern int joy_x;
 extern int joy_y;
+extern int joy_1;
+extern int joy_2;
 
 void M_BindBaseControls(void)
 {
@@ -367,6 +369,7 @@ void M_BindBaseControls(void)
     M_BindVariable("key_fly_down",           &joy_b);
     M_BindVariable("key_look_center",        &joy_up);
     M_BindVariable("key_jump",               &joy_home);
+    M_BindVariable("key_run",               &joy_1);
 /*
     M_BindVariable("use_mouse",                 &usemouse);
     M_BindVariable("key_invDrop",        &key_invdrop);
