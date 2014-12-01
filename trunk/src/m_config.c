@@ -46,6 +46,7 @@ extern int key_strafeleft;
 extern int key_fire;
 extern int key_use;
 extern int key_jump;
+extern int key_run;
 extern int key_invright;
 extern int key_flyup;
 extern int key_flydown;
@@ -192,6 +193,7 @@ extern int key_invright, key_invuse;
     CONFIG_VARIABLE_INT		(key_fly_down),
     CONFIG_VARIABLE_INT		(key_look_center),
     CONFIG_VARIABLE_INT		(key_jump),
+    CONFIG_VARIABLE_INT		(key_run),
 /*
 #ifdef FEATURE_SOUND
 

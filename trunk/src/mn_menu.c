@@ -323,7 +323,7 @@ int rmap = 1;
 int rskill = 0;
 
 int key_bindings_start_in_cfg_at_pos = 19;
-int key_bindings_end_in_cfg_at_pos = 34;
+int key_bindings_end_in_cfg_at_pos = 35;
 /*
 int memory_info = 0;
 int battery_info = 0;
@@ -790,17 +790,18 @@ static MenuItem_t BindingsItems[] = {
     {ITT_SETKEY, "FLY DOWN", SCSetKey, 12, MENU_NONE},
     {ITT_SETKEY, "LOOK CENTER", SCSetKey, 13, MENU_NONE},
     {ITT_SETKEY, "JUMP", SCSetKey, 14, MENU_NONE},
+    {ITT_SETKEY, "RUN", SCSetKey, 15, MENU_NONE},
 //    {ITT_EMPTY, NULL, NULL, 11, MENU_NONE},
 //    {ITT_LRFUNC, "BUTTON LAYOUT :", ButtonLayout, 12, MENU_NONE},
-    {ITT_EMPTY, NULL, NULL, 15, MENU_NONE},
-    {ITT_SETKEY, "CLEAR ALL CONTROLS", ClearKeys, 16, MENU_NONE},
-    {ITT_SETKEY, "RESET TO DEFAULTS", ResetKeys, 17, MENU_NONE}
+    {ITT_EMPTY, NULL, NULL, 16, MENU_NONE},
+    {ITT_SETKEY, "CLEAR ALL CONTROLS", ClearKeys, 17, MENU_NONE},
+    {ITT_SETKEY, "RESET TO DEFAULTS", ResetKeys, 18, MENU_NONE}
 };
 
 static Menu_t BindingsMenu = {
-    40, 10,
+    40, 5,
     DrawBindingsMenu,
-    18, BindingsItems,
+    19, BindingsItems,
     0,
     MENU_BINDINGS
 };
@@ -2145,6 +2146,8 @@ static char *stupidtable[] =
 #define CLASSIC_CONTROLLER_HOME		0x1000
 #define CLASSIC_CONTROLLER_X		0x2000
 #define CLASSIC_CONTROLLER_Y		0x4000
+#define CONTROLLER_1			0x8000
+#define CONTROLLER_2			0x10000
 
 char *Key2String (int ch)
 {
@@ -2172,6 +2175,8 @@ char *Key2String (int ch)
 	case CLASSIC_CONTROLLER_ZR:	return "ZR";
 	case CLASSIC_CONTROLLER_L:	return "LEFT TRIGGER";
 	case CLASSIC_CONTROLLER_R:	return "RIGHT TRIGGER";
+	case CONTROLLER_1:		return "1";
+	case CONTROLLER_2:		return "2";
     }
 
     // Handle letter keys
@@ -2210,6 +2215,7 @@ static void ClearKeys (int option)
     *doom_defaults_list[31].location = 0;
     *doom_defaults_list[32].location = 0;
     *doom_defaults_list[33].location = 0;
+    *doom_defaults_list[34].location = 0;
 }
 
 static void ResetKeys (int option)
@@ -2229,6 +2235,7 @@ static void ResetKeys (int option)
     *doom_defaults_list[31].location = CLASSIC_CONTROLLER_B;
     *doom_defaults_list[32].location = CLASSIC_CONTROLLER_UP;
     *doom_defaults_list[33].location = CLASSIC_CONTROLLER_HOME;
+    *doom_defaults_list[34].location = CONTROLLER_1;
 }
 
 //---------------------------------------------------------------------------
@@ -3551,12 +3558,12 @@ static void DrawBindingsMenu(void)
 {
     int ctrls;
 
-    for (ctrls = 0; ctrls < 15; ctrls++)
+    for (ctrls = 0; ctrls < 16; ctrls++)
     {
 	if (askforkey && keyaskedfor == ctrls)
-	    MN_DrTextA("???", 195, (ctrls*10+10));
+	    MN_DrTextA("???", 195, (ctrls*10+5));
 	else
-	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+19].location)),195,(ctrls*10+10));
+	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+19].location)),195,(ctrls*10+5));
     }
 
 /*
