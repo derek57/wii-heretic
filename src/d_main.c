@@ -80,6 +80,9 @@
 GameMode_t gamemode = indetermined;
 char *gamedescription = "unknown";
 
+boolean demos_are_disabled = true;
+boolean do_not_repeat_music = false;
+
 boolean nomonsters;             // checkparm of -nomonsters
 boolean respawnparm;            // checkparm of -respawn
 
@@ -403,14 +406,18 @@ void D_DoAdvanceDemo(void)
             pagetic = 210;
             gamestate = GS_DEMOSCREEN;
 	    pagename = DEH_String("TITLE");
+	    if(demos_are_disabled && !do_not_repeat_music)
+	    {
 #ifdef OGG_SUPPORT
-	    if(opl)
+		if(opl)
 #endif
-		S_StartSong(mus_titl, false);
+		    S_StartSong(mus_titl, false);
+		    do_not_repeat_music = true;
 #ifdef OGG_SUPPORT
-	    else
-		S_StartMP3Music(2, 0); 
+		else
+		    S_StartMP3Music(2, 0); 
 #endif
+	    }
             break;
         case 1:
             pagetic = 140;

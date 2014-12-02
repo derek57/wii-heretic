@@ -292,6 +292,7 @@ static int quickload;
 extern default_t doom_defaults_list[];
 
 extern boolean am_rotate;
+extern boolean do_not_repeat_music;
 
 static boolean askforkey = false;
 
@@ -1817,6 +1818,7 @@ static void/*boolean*/ SCEndGame(int option)
     {
         paused = true;
     }
+    do_not_repeat_music = false;
 //    return true;
 }
 
