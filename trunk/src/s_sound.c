@@ -107,12 +107,12 @@ void S_Start(void)
 void S_StartSong(int song, boolean loop)
 {
     int mus_len;
-/*
+
     if (song == mus_song)
     {                           // don't replay an old song
         return;
     }
-*/
+
     if (rs != NULL)
     {
         I_StopSong();
