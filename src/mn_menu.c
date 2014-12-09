@@ -3591,12 +3591,12 @@ static void SCWeaponChange(int option)
     if(use_vanilla_weapon_change < 1)
     {
 	use_vanilla_weapon_change++;
-	P_SetMessage(&players[consoleplayer], "ORIGINAL WEAPON CHANGING STYLE DISABLED", true);
+	P_SetMessage(&players[consoleplayer], "ORIGINAL WEAPON CHANGING STYLE ENABLED", true);
     }
     else if(use_vanilla_weapon_change)
     {
 	use_vanilla_weapon_change--;
-	P_SetMessage(&players[consoleplayer], "ORIGINAL WEAPON CHANGING STYLE ENABLED", true);
+	P_SetMessage(&players[consoleplayer], "ORIGINAL WEAPON CHANGING STYLE DISABLED", true);
     }
 }
 
