@@ -158,6 +158,7 @@ static void SCMouselook(int option);
 static void SCArtifact(int option);
 static void SCQuartz(int option);
 static void SCUrn(int option);
+static void SCMapScroll(int option);
 static void SCTorch(int option);
 static void SCOvum(int option);
 static void SCWings(int option);
@@ -927,7 +928,8 @@ static MenuItem_t ArtifactsItems[] = {
     {ITT_EFUNC, "TIMEBOMB OF THE ANCIENTS", SCTimebomb, 0, MENU_NONE},
     {ITT_EFUNC, "TOME OF POWER", SCTome, 0, MENU_NONE},
     {ITT_EFUNC, "CHAOS DEVICE", SCChaosDev, 0, MENU_NONE},
-    {ITT_EFUNC, "MYSTIC URN", SCUrn, 0, MENU_NONE}
+    {ITT_EFUNC, "MYSTIC URN", SCUrn, 0, MENU_NONE},
+    {ITT_EFUNC, "MAP SCROLL", SCMapScroll, 0, MENU_NONE}
 };
 
 static MenuItem_t CheatsItems[] = {
@@ -986,7 +988,7 @@ static Menu_t WeaponsMenu = {
 static Menu_t ArtifactsMenu = {
     80, 30,
     DrawArtifactsMenu,
-    12, ArtifactsItems,
+    13, ArtifactsItems,
     0,
     MENU_ARTIFACTS
 };
@@ -4161,6 +4163,21 @@ static void SCUrn(int option)
 	P_GiveArtifact(player, arti_superhealth, NULL);
 
 	P_SetMessage(&players[consoleplayer], "MYSTIC URN ADDED", true);
+    }
+    DetectState();
+    S_StartSound(NULL, sfx_chat);
+}
+
+static void SCMapScroll(int option)
+{
+    if(!demoplayback && gamestate == GS_LEVEL && gameskill != sk_nightmare && players[consoleplayer].playerstate == PST_LIVE)
+    {
+	static player_t* player;
+	player = &players[consoleplayer];
+
+	P_GivePower(player, pw_allmap);
+
+	P_SetMessage(&players[consoleplayer], "MAP SCROLL ADDED", true);
     }
     DetectState();
     S_StartSound(NULL, sfx_chat);
