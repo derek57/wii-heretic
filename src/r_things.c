@@ -425,8 +425,12 @@ void R_DrawVisSprite(vissprite_t * vis, int x1, int x2)
 
     if (vis->footclip && !vis->psprite)
     {
-        sprbotscreen = sprtopscreen + FixedMul(patch->height << FRACBITS,
+//        sprbotscreen = sprtopscreen + FixedMul(patch->height << FRACBITS,	// WII WATER BUG
+//                                               spryscale);
+
+        sprbotscreen = sprtopscreen + FixedMul(SHORT(patch->height) << FRACBITS,	// WII-FIX
                                                spryscale);
+
         baseclip = (sprbotscreen - FixedMul(vis->footclip << FRACBITS,
                                             spryscale)) >> FRACBITS;
     }
