@@ -804,6 +804,8 @@ void DrawCommonBar(void)
 //
 //---------------------------------------------------------------------------
 
+extern boolean game_loaded;
+
 void DrawMainBar(void)
 {
 //    int i;
@@ -826,10 +828,22 @@ void DrawMainBar(void)
     {
         V_DrawPatch(180, 161, PatchBLACKSQ);
         if (CPlayer->readyArtifact > 0)
-        {
+        {	    
             V_DrawPatch(179, 160, 
                         W_CacheLumpName(DEH_String(patcharti[CPlayer->readyArtifact]),
                                         PU_CACHE));
+
+	    if(game_loaded)		// THIS FIXES A WII BUG WITH THE INVENTORY
+	    {
+		int x = inv_ptr - curpos;
+		char *patch = DEH_String(patcharti[CPlayer->inventory[x].type]);
+
+		V_DrawPatch(180, 161, PatchBLACKSQ);
+		V_DrawPatch(179, 160, W_CacheLumpName(patch, PU_CACHE));
+
+		game_loaded = false;
+	    }
+
             DrSmallNumber(CPlayer->inventory[inv_ptr].count, 201, 182);
         }
         oldarti = CPlayer->readyArtifact;

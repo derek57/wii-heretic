@@ -1909,6 +1909,8 @@ void G_LoadGame(char *name)
 
 #define VERSIONSIZE 16
 
+boolean game_loaded = false;
+
 void G_DoLoadGame(void)
 {
     int i;
@@ -1960,6 +1962,7 @@ void G_DoLoadGame(void)
     {                           // Missing savegame termination marker
         I_Error("Bad savegame");
     }
+    game_loaded = true;
 }
 
 
