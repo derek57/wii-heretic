@@ -303,6 +303,8 @@ static int keyaskedfor;
 boolean loop = true;
 boolean forced = false;
 boolean fake = false;
+boolean refreshing = false;		// WII INVENTORY UPSTREAM FIX #3
+boolean inside_menu = false;		// WII INVENTORY UPSTREAM FIX #3
 
 int ninty;
 int FramesPerSecond;
@@ -1400,6 +1402,7 @@ void MN_Drawer(void)
         UpdateState |= I_FULLSCRN;
         if (InfoType)
         {
+	    inside_menu = true;
             MN_DrawInfo();
             return;
         }
@@ -1462,7 +1465,18 @@ void MN_Drawer(void)
 	    selName = MenuTime&16 ? "M_SLCTR1" : "M_SLCTR2";
 	    V_DrawPatch(x+SELECTOR_XOFFSET, y, 
 		W_CacheLumpName(selName, PU_CACHE));
+	    refreshing = false;				// WII INVENTORY UPSTREAM FIX #3
 	}
+
+	if (CurrentMenu==&LoadMenu	||
+	    CurrentMenu==&SaveMenu	||
+	    CurrentMenu==&GameMenu	||
+	    CurrentMenu==&ControlMenu	||
+	    CurrentMenu==&BindingsMenu	||
+	    CurrentMenu==&DebugMenu	||
+	    CurrentMenu==&KeysMenu	||
+	    CurrentMenu==&CheatsMenu)
+	    refreshing = true;				// WII INVENTORY UPSTREAM FIX #3
     }
 }
 
@@ -3500,6 +3514,7 @@ static void SCTicker(int option)
 
     I_DisplayFPSDots(DisplayTicker);
 
+    inside_menu = true;				// WII INVENTORY UPSTREAM FIX #3
     SB_state = -1;      //refresh the statbar
     BorderNeedRefresh = true;
 
@@ -3842,6 +3857,7 @@ static void SCYellow(int option)
 
 	P_SetMessage(player, DEH_String("YELLOW KEY ADDED"), false);
     }
+    inside_menu = true;				// WII INVENTORY UPSTREAM FIX #3
     SB_state = -1;      //refresh the statbar
     BorderNeedRefresh = true;
     DetectState();
@@ -3861,6 +3877,7 @@ static void SCGreen(int option)
 
 	P_SetMessage(player, DEH_String("GREEN KEY ADDED"), false);
     }
+    inside_menu = true;				// WII INVENTORY UPSTREAM FIX #3
     SB_state = -1;      //refresh the statbar
     BorderNeedRefresh = true;
     DetectState();
@@ -3880,6 +3897,7 @@ static void SCBlue(int option)
 
 	P_SetMessage(player, DEH_String("BLUE KEY ADDED"), false);
     }
+    inside_menu = true;				// WII INVENTORY UPSTREAM FIX #3
     SB_state = -1;      //refresh the statbar
     BorderNeedRefresh = true;
     DetectState();
