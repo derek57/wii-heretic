@@ -433,12 +433,12 @@ fixed_t P_FindNextHighestFloor(sector_t * sec, int currentheight)
     }
 
     // Compatibility note, in case of demo desyncs.
-
+/*
     if (h > 20)
     {
         fprintf(stderr, "P_FindNextHighestFloor: exceeded Vanilla limit\n");
     }
-
+*/
     return min;
 }
 

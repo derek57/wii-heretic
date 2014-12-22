@@ -1909,7 +1909,7 @@ void G_LoadGame(char *name)
 
 #define VERSIONSIZE 16
 
-boolean game_loaded = false;
+boolean game_loaded = false;				// WII INVENTORY UPSTREAM FIX #1
 
 void G_DoLoadGame(void)
 {
@@ -1962,7 +1962,7 @@ void G_DoLoadGame(void)
     {                           // Missing savegame termination marker
         I_Error("Bad savegame");
     }
-    game_loaded = true;
+    game_loaded = true;				// WII INVENTORY UPSTREAM FIX #1
 }
 
 
@@ -2295,6 +2295,19 @@ boolean G_CheckDemoStatus(void)
 
 void G_SaveGame(int slot, char *description)
 {
+/*						   MOST LIKELY NOT NEEDED ANYMORE AS OF UPSTREAM FIX #3
+//----------------------------------------------//
+    int x = inv_ptr - curpos;			// THIS IS IMPORTANT FOR THE WII BECAUSE OF THE MAIN
+						// MENU ENHANCEMENTS. A SAVEGAME STORES THE ARTIFACT
+    static player_t *CPlayer;			// SELECTED IN THE INVENTORY. SO THIS HACK HERE NOW
+    CPlayer = &players[consoleplayer];		// HOPEFULLY RESETS THE INVENTORY ITEM CORRECTLY WHEN
+						// LOADING A SAVED GAME. (THIS IS UPSTREAM FIX #2)
+    if(CPlayer->artifactCount < 1)		// REASON: SB_STATE REFRESHING UPON TOO MANY MENU
+	CPlayer->readyArtifact = CPlayer->inventory[x].type;	// ENTRIES TO DISPLAY. IF THERE
+    else					// ARE TOO MANY ENTRIES, THEN THEY OVERLAY WITH THE
+	CPlayer->readyArtifact = 0;		// STATUS BAR SO WE DO A SB_STATE -1 REFRESH. BUT THIS
+//----------------------------------------------// ALSO INTERFERES WITH THE INVENTORY AND CAUSES A BUG.
+*/
     savegameslot = slot;
 
     time_t theTime = time(NULL);
@@ -2312,6 +2325,8 @@ void G_SaveGame(int slot, char *description)
     else
 	sprintf(savedescription, "E%dM%d %d/%d/%d %2.2d:%2.2d",
 		gameepisode, gamemap, year, month, day, hour, min);
+
+    
 
     sendsave = true;
 }

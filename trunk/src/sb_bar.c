@@ -573,6 +573,9 @@ static int oldkeys = -1;
 int playerkeys = 0;
 
 extern boolean automapactive;
+extern boolean refreshing;		// WII INVENTORY UPSTREAM FIX #3
+extern boolean game_loaded;		// WII INVENTORY UPSTREAM FIX #1
+extern boolean inside_menu;		// WII INVENTORY UPSTREAM FIX #3
 
 void SB_Drawer(void)
 {
@@ -619,7 +622,10 @@ void SB_Drawer(void)
             {
                 // Main interface
                 V_DrawPatch(34, 160, PatchSTATBAR);
-                oldarti = 0;
+
+		if(!refreshing || !inside_menu)		// WII INVENTORY UPSTREAM FIX #3
+		    oldarti = 0;
+
                 oldammo = -1;
                 oldarmor = -1;
                 oldweapon = -1;
@@ -804,8 +810,6 @@ void DrawCommonBar(void)
 //
 //---------------------------------------------------------------------------
 
-extern boolean game_loaded;
-
 void DrawMainBar(void)
 {
 //    int i;
@@ -823,32 +827,44 @@ void DrawMainBar(void)
         oldarti = -1;           // so that the correct artifact fills in after the flash
         UpdateState |= I_STATBAR;
     }
-    else if (oldarti != CPlayer->readyArtifact
-             || oldartiCount != CPlayer->inventory[inv_ptr].count)
+    else if(oldarti != CPlayer->readyArtifact	||
+	    refreshing				||		// WII INVENTORY UPSTREAM FIX #3
+	    inside_menu				||		// WII INVENTORY UPSTREAM FIX #3
+	    oldartiCount != CPlayer->inventory[inv_ptr].count)
     {
         V_DrawPatch(180, 161, PatchBLACKSQ);
         if (CPlayer->readyArtifact > 0)
-        {	    
+        {
             V_DrawPatch(179, 160, 
                         W_CacheLumpName(DEH_String(patcharti[CPlayer->readyArtifact]),
                                         PU_CACHE));
-
-	    if(game_loaded)		// THIS FIXES A WII BUG WITH THE INVENTORY
-	    {
-		int x = inv_ptr - curpos;
-		char *patch = DEH_String(patcharti[CPlayer->inventory[x].type]);
-
-		V_DrawPatch(180, 161, PatchBLACKSQ);
-		V_DrawPatch(179, 160, W_CacheLumpName(patch, PU_CACHE));
-
-		game_loaded = false;
-	    }
-
+//----------------------------------------------------------------------// (WII INV. UPSTREAM FIX #1)
+	    if(game_loaded)						//		^
+	    {								//		|
+		int x = inv_ptr - curpos;				//		|
+		char *patch = DEH_String(patcharti[CPlayer->inventory[x].type]);//	|
+									//		|
+		V_DrawPatch(180, 161, PatchBLACKSQ);			//		|
+		V_DrawPatch(179, 160, W_CacheLumpName(patch, PU_CACHE));//		|
+									//		|
+		game_loaded = false;					//		|
+	    }								//		⌵
+//----------------------------------------------------------------------// (WII INV. UPSTREAM FIX #1)
+//----------------------------------------------------------------------// (WII INV. UPSTREAM FIX #3)
+	    if(refreshing || inside_menu)				//		^
+	    {								//		|
+		char *patch = DEH_String(patcharti[CPlayer->inventory[inv_ptr].type]);//|
+									//		|
+		V_DrawPatch(180, 161, PatchBLACKSQ);			//		|
+		V_DrawPatch(179, 160, W_CacheLumpName(patch, PU_CACHE));//		|
+	    }								//		⌵
+//----------------------------------------------------------------------// (WII INV. UPSTREAM FIX #3)
             DrSmallNumber(CPlayer->inventory[inv_ptr].count, 201, 182);
         }
         oldarti = CPlayer->readyArtifact;
         oldartiCount = CPlayer->inventory[inv_ptr].count;
         UpdateState |= I_STATBAR;
+	inside_menu = false;
     }
 
     // Frags
