@@ -82,6 +82,9 @@ void (*tlcolfunc) (void);
 void (*transcolfunc) (void);
 void (*spanfunc) (void);
 
+extern boolean MenuActive;
+extern boolean automapactive;
+
 /*
 ===================
 =
@@ -662,7 +665,11 @@ void R_ExecuteSetViewSize(void)
 //
 // draw the border
 //
-    R_DrawViewBorder();         // erase old menu stuff
+    if (gamestate == GS_LEVEL && !automapactive && scaledviewwidth != (320 << hires))	// CHANGED FOR HIRES
+    {
+	if (MenuActive /*|| menuactivestate || !viewactivestate*/)
+	    R_DrawViewBorder();         // erase old menu stuff
+    }
 }
 
 
