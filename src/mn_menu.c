@@ -1262,6 +1262,7 @@ void FPS(int FramesPerSecond)
     {
 	MN_DrTextA(fpsDisplay, 0, 30);
     }
+    BorderNeedRefresh = true;
 }
 
 void MN_Drawer(void)
@@ -1315,6 +1316,7 @@ void MN_Drawer(void)
     if(HERETIC_BETA && !MenuActive && !askforquit && leveltime & 16 && gamestate == GS_LEVEL)
     {
 	MN_DrTextA(BETA_FLASH_TEXT,295-(MN_TextAWidth(BETA_FLASH_TEXT)>>1), 5);	// DISPLAYS BETA MESSAGE
+	BorderNeedRefresh = true;
     }
 
     if(HERETIC_BETA && MenuActive)
@@ -1384,6 +1386,7 @@ void MN_Drawer(void)
                            MN_TextAWidth(SlotText[quickload - 1]) / 2, 90);
             }
 */
+	    BorderNeedRefresh = true;
             UpdateState |= I_FULLSCRN;
         }
 
