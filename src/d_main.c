@@ -67,6 +67,8 @@
 
 #include "m_misc.h"
 
+#include "c_io.h"
+
 #define CT_KEY_GREEN    'g'
 #define CT_KEY_YELLOW   'y'
 #define CT_KEY_RED      'r'
@@ -125,6 +127,7 @@ boolean			HERETIC_REG_1_2 = false;
 boolean			HERETIC_REG_1_3 = false;
 
 extern int warped;
+extern int mus_engine;
 
 int		fsize = 0;
 int		fsizerw = 0;
@@ -151,6 +154,10 @@ void D_ProcessEvents(void)
             continue;
         }
         if (MN_Responder(ev))
+        {
+            continue;
+        }
+        if (C_Responder(ev))
         {
             continue;
         }
@@ -227,6 +234,9 @@ void D_Display(void)
         case GS_DEMOSCREEN:
             D_PageDrawer();
             break;
+
+        case GS_CONSOLE:
+            break;
     }
 /*
     if (testcontrols)
@@ -254,6 +264,8 @@ void D_Display(void)
     }
     // Handle player messages
     DrawMessage();
+
+    C_Drawer();
 
     // Menu drawing
     MN_Drawer();
@@ -283,6 +295,8 @@ boolean D_GrabMouseCallback(void)
     return (gamestate == GS_LEVEL) && !demoplayback && !advancedemo;
 }
 
+/*static*/ void I_SDL_PollMusic(void);
+
 //---------------------------------------------------------------------------
 //
 // PROC D_DoomLoop
@@ -308,6 +322,10 @@ void D_DoomLoop(void)
 
     while (1)
     {
+	// check if the OGG music stopped playing
+	if(gamestate == GS_LEVEL && usergame)
+	    I_SDL_PollMusic();
+
         // Frame syncronous IO operations
         I_StartFrame();
 
@@ -525,9 +543,9 @@ void D_CheckRecordFrom(void)
 #define SHAREWAREWADNAME "heretic1.wad"
 
 char *iwadfile;
-
-char *basedefault = "heretic.cfg";
 /*
+char *basedefault = "heretic.cfg";
+
 void wadprintf(void)
 {
     if (debugmode)
@@ -895,7 +913,7 @@ void D_DoomMain(void)
     I_PrintBanner(PACKAGE_STRING);
 */
     if(debugmode)
-	fsize = 11096488;
+	fsize = 14189976;
 
 //    W_CheckSize(0);
 
@@ -1159,10 +1177,22 @@ void D_DoomMain(void)
     M_SetConfigFilenames("heretic.cfg"/*, PROGRAM_PREFIX "heretic.cfg"*/);
     M_LoadDefaults();
 
+    if(mus_engine > 1)
+	mus_engine = 2;
+    else if(mus_engine < 2)
+	mus_engine = 1;
+
+    if(mus_engine == 1)
+	snd_musicdevice = SNDDEVICE_SB;
+    else
+	snd_musicdevice = SNDDEVICE_GENMIDI;
+
     I_AtExit(M_SaveDefaults, false);
 
     DEH_printf("Z_Init: Init zone memory allocation daemon.\n");
     Z_Init();
+
+    C_Init();
 
     printf("DPMI memory: 0x3c9e000, 0x800000 allocated for zone\n");
 
@@ -1184,9 +1214,9 @@ void D_DoomMain(void)
     if(debugmode)
     {
 	if(usb)
-	    D_AddFile("usb:/apps/wiiheretic/IWAD/Reg10/HERETIC.WAD");
+	    D_AddFile("usb:/apps/wiiheretic/IWAD/Reg13/HERETIC.WAD");
 	else if(sd)
-	    D_AddFile("sd:/apps/wiiheretic/IWAD/Reg10/HERETIC.WAD");
+	    D_AddFile("sd:/apps/wiiheretic/IWAD/Reg13/HERETIC.WAD");
     }
     else
 	D_AddFile(target);

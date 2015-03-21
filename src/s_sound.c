@@ -43,6 +43,8 @@
 
 #include "doomfeatures.h"
 
+#include "c_io.h"
+
 /*
 ===============================================================================
 
@@ -76,6 +78,7 @@ short currentsong = 0;
 //extern boolean opl;
 extern boolean forced;
 extern boolean fake;
+extern boolean change_anyway;
 
 extern int faketracknum;
 extern int tracknum;
@@ -108,10 +111,12 @@ void S_StartSong(int song, boolean loop)
 {
     int mus_len;
 
-    if (song == mus_song)
+    if (song == mus_song && !change_anyway)
     {                           // don't replay an old song
         return;
     }
+
+    change_anyway = false;
 
     if (rs != NULL)
     {
@@ -123,10 +128,18 @@ void S_StartSong(int song, boolean loop)
     {
         return;
     }
+
+    if(loop)
+	C_Printf(" S_STARTSONG: %s (LOOP = YES)\n", S_music[song].name);
+    else
+	C_Printf(" S_STARTSONG: %s (LOOP = NO)\n", S_music[song].name);
+
     mus_lumpnum = W_GetNumForName(S_music[song].name);
     mus_sndptr = W_CacheLumpNum(mus_lumpnum, PU_MUSIC);
     mus_len = W_LumpLength(mus_lumpnum);
+
     rs = I_RegisterSong(mus_sndptr, mus_len);
+
 #ifdef OGG_SUPPORT
     if(opl)
 #endif

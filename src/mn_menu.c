@@ -45,6 +45,8 @@
 
 #include "doomfeatures.h"
 
+#include "c_io.h"
+
 // Macros
 
 #define LEFT_DIR 0
@@ -205,9 +207,9 @@ static void SCShowMemory(int option);
 static void SCBattery(int option);
 */
 static void SCVersion(int option);
-#ifdef OGG_SUPPORT
+//#ifdef OGG_SUPPORT
 static void SCMusicType(int option);
-#endif
+//#endif
 static void SCSound(int option);
 static void SCCoords(int option);
 static void SCMapname(int option);
@@ -305,6 +307,7 @@ boolean forced = false;
 boolean fake = false;
 boolean refreshing = false;		// WII INVENTORY UPSTREAM FIX #3
 boolean inside_menu = false;		// WII INVENTORY UPSTREAM FIX #3
+boolean mus_cheat_used = false;
 
 int ninty;
 int FramesPerSecond;
@@ -325,9 +328,10 @@ int warped = 0;
 int repisode = 1;
 int rmap = 1;
 int rskill = 0;
+int mus_engine = 1;
 
-int key_bindings_start_in_cfg_at_pos = 19;
-int key_bindings_end_in_cfg_at_pos = 35;
+int key_bindings_start_in_cfg_at_pos = 20;
+int key_bindings_end_in_cfg_at_pos = 37;
 /*
 int memory_info = 0;
 int battery_info = 0;
@@ -750,7 +754,7 @@ static Menu_t ScreenMenu = {
     DrawScreenMenu,
     5, ScreenItems,
     0,
-    MENU_SCREEN
+    MENU_OPTIONS
 };
 
 static MenuItem_t ControlItems[] = {
@@ -771,7 +775,7 @@ static Menu_t ControlMenu = {
     DrawControlMenu,
     10, ControlItems,
     0,
-    MENU_CONTROL
+    MENU_OPTIONS
 };
 
 static MenuItem_t BindingsItems[] = {
@@ -795,9 +799,10 @@ static MenuItem_t BindingsItems[] = {
     {ITT_SETKEY, "LOOK CENTER", SCSetKey, 13, MENU_NONE},
     {ITT_SETKEY, "JUMP", SCSetKey, 14, MENU_NONE},
     {ITT_SETKEY, "RUN", SCSetKey, 15, MENU_NONE},
+    {ITT_SETKEY, "CONSOLE", SCSetKey, 16, MENU_NONE},
 //    {ITT_EMPTY, NULL, NULL, 11, MENU_NONE},
 //    {ITT_LRFUNC, "BUTTON LAYOUT :", ButtonLayout, 12, MENU_NONE},
-    {ITT_EMPTY, NULL, NULL, 16, MENU_NONE},
+//    {ITT_EMPTY, NULL, NULL, 16, MENU_NONE},
     {ITT_SETKEY, "CLEAR ALL CONTROLS", ClearKeys, 17, MENU_NONE},
     {ITT_SETKEY, "RESET TO DEFAULTS", ResetKeys, 18, MENU_NONE}
 };
@@ -807,7 +812,7 @@ static Menu_t BindingsMenu = {
     DrawBindingsMenu,
     19, BindingsItems,
     0,
-    MENU_BINDINGS
+    MENU_CONTROL
 };
 
 static MenuItem_t SoundItems[] = {
@@ -816,23 +821,23 @@ static MenuItem_t SoundItems[] = {
     {ITT_LRFUNC, "MUSIC VOLUME", SCMusicVolume, 0, MENU_NONE},
     {ITT_EMPTY, NULL, NULL, 0, MENU_NONE},
     {ITT_LRFUNC, "CHOOSE TRACK :", SCNTrack, 0, MENU_NONE}
-#ifdef OGG_SUPPORT
+//#ifdef OGG_SUPPORT
     ,
     {ITT_LRFUNC, "MUSIC TYPE :", SCMusicType, 0, MENU_NONE}
-#endif
+//#endif
     /*,{ITT_LRFUNC, "LOOP TRACK :", SCNTrackLoop, 0, MENU_NONE}*/
 };
 
 static Menu_t SoundMenu = {
-    75, 30,
+    75, 10,
     DrawSoundMenu,
-#ifdef OGG_SUPPORT
+//#ifdef OGG_SUPPORT
     6, SoundItems,
-#else
-    5, SoundItems,
-#endif
+//#else
+//    5, SoundItems,
+//#endif
     0,
-    MENU_SOUND
+    MENU_OPTIONS
 };
 
 static MenuItem_t SystemItems[] = {
@@ -847,7 +852,7 @@ static Menu_t SystemMenu = {
     DrawSystemMenu,
     3, SystemItems,
     0,
-    MENU_SYSTEM
+    MENU_OPTIONS
 };
 
 static MenuItem_t GameItems[] = {
@@ -867,7 +872,7 @@ static Menu_t GameMenu = {
     DrawGameMenu,
     9, GameItems,
     0,
-    MENU_GAME
+    MENU_OPTIONS
 };
 
 static MenuItem_t DebugItems[] = {
@@ -887,7 +892,7 @@ static Menu_t DebugMenu = {
     DrawDebugMenu,
     5, DebugItems,
     0,
-    MENU_DEBUG
+    MENU_OPTIONS
 };
 
 static MenuItem_t KeysItems[] = {
@@ -968,7 +973,7 @@ static Menu_t KeysMenu = {
     DrawKeysMenu,
     5, KeysItems,
     0,
-    MENU_KEYS
+    MENU_CHEATS
 };
 
 static Menu_t ArmorMenu = {
@@ -976,7 +981,7 @@ static Menu_t ArmorMenu = {
     DrawArmorMenu,
     4, ArmorItems,
     0,
-    MENU_ARMOR
+    MENU_CHEATS
 };
 
 static Menu_t WeaponsMenu = {
@@ -984,7 +989,7 @@ static Menu_t WeaponsMenu = {
     DrawWeaponsMenu,
     10, WeaponsItems,
     0,
-    MENU_WEAPONS
+    MENU_CHEATS
 };
 
 static Menu_t ArtifactsMenu = {
@@ -992,7 +997,7 @@ static Menu_t ArtifactsMenu = {
     DrawArtifactsMenu,
     13, ArtifactsItems,
     0,
-    MENU_ARTIFACTS
+    MENU_CHEATS
 };
 
 static Menu_t CheatsMenu = {
@@ -1000,7 +1005,7 @@ static Menu_t CheatsMenu = {
     DrawCheatsMenu,
     18, CheatsItems,
     0,
-    MENU_CHEATS
+    MENU_FILES
 };
 
 static Menu_t RecordMenu = {
@@ -1008,7 +1013,7 @@ static Menu_t RecordMenu = {
     DrawRecordMenu,
     5, RecordItems,
     0,
-    MENU_RECORD
+    MENU_FILES
 };
 
 static Menu_t *Menus[] = {
@@ -1099,12 +1104,27 @@ void MN_DrTextA(char *text, int x, int y)
         {
             x += 5;
         }
-        else
+        else if(c != 123 && c != 124 && c != 125 && c != '_')
         {
             p = W_CacheLumpNum(FontABaseLump + c - 33, PU_CACHE);
             V_DrawPatch(x, y, p);
             x += SHORT(p->width) - 1;
         }
+
+	if(c == 123)
+	    V_DrawPatch(x + 1, y, W_CacheLumpName(DEH_String("STCFN123"), PU_CACHE));
+	else if(c == 124)
+	{
+	    x += 8;
+	    V_DrawPatch(x, y, W_CacheLumpName(DEH_String("STCFN124"), PU_CACHE));
+	}
+	else if(c == 125)
+	    V_DrawPatch(x + 9, y, W_CacheLumpName(DEH_String("STCFN125"), PU_CACHE));
+	else if(c == '_')
+	{
+	    V_DrawPatch(x, y, W_CacheLumpName(DEH_String("FONTA60"), PU_CACHE));
+            x += 6;
+	}
     }
 }
 
@@ -1313,16 +1333,22 @@ void MN_Drawer(void)
     }
 
 	// Beta blinker ***
-    if(HERETIC_BETA && !MenuActive && !askforquit && leveltime & 16 && gamestate == GS_LEVEL)
+    if (HERETIC_BETA && !MenuActive && !askforquit && leveltime & 16 &&
+	gamestate == GS_LEVEL && current_height == 0)
     {
-	MN_DrTextA(BETA_FLASH_TEXT,295-(MN_TextAWidth(BETA_FLASH_TEXT)>>1), 5);	// DISPLAYS BETA MESSAGE
+	// DISPLAYS BETA MESSAGE
+	MN_DrTextA(BETA_FLASH_TEXT,295-(MN_TextAWidth(BETA_FLASH_TEXT)>>1), 5);
 	BorderNeedRefresh = true;
     }
 
     if(HERETIC_BETA && MenuActive)
     {
-	MN_DrTextA(" ", 295, 5);						// DISABLES MESSAGE
+	// DISABLES MESSAGE
+	MN_DrTextA(" ", 295, 5);
     }
+
+    if(CurrentMenu == &SoundMenu && CurrentItPos == 5 && MenuActive)
+	MN_DrTextA("YOU MUST RESTART TO TAKE EFFECT.", 48, 136);
 
     if(!askforquit && gamestate == GS_LEVEL)
     {
@@ -1335,8 +1361,9 @@ void MN_Drawer(void)
 	    MN_DrTextA(DEH_String(level_name), 20, 145);
 	}
 
+	// DISPLAYS GAME TIME
 	if(timer==1)
-		DrawWorldTimer();						// DISPLAYS GAME TIME
+		DrawWorldTimer();						
 
 	if(coords==1)
 	{
@@ -1358,8 +1385,12 @@ void MN_Drawer(void)
 	if(version==1)
 	{
 		sprintf(date,"%d-%02d-%02d", YEAR, MONTH + 1, DAY);
-		MN_DrTextA(HERETIC_VERSION_TEXT,55, 36);			// DISPLAYS VERSION
-		MN_DrTextA(date, 195, 36);					// DISPLAYS THE DATE
+
+		// DISPLAYS VERSION
+		MN_DrTextA(HERETIC_VERSION_TEXT,55, 36);			
+
+		// DISPLAYS THE DATE
+		MN_DrTextA(date, 195, 36);					
 	}
     }
 
@@ -2057,50 +2088,34 @@ static void/*boolean*/ SCMusicVolume(int option)
 //    return true;
 }
 
-#ifdef OGG_SUPPORT
-/*static*/ boolean I_OPL_InitMusic(void);
+//#ifdef OGG_SUPPORT
+///*static*/ boolean I_OPL_InitMusic(void);
 
 static void SCMusicType(int option)
 {
     switch(option)
     {
 	case 0:
-	    if(gamestate != GS_DEMOSCREEN && gamestate != GS_INTERMISSION  && gamestate != GS_FINALE && !demoplayback)
-	    {
-		tracknum = 0;
-//		faketracknum = 1;
-		opl = 0;
-		S_StartMP3Music(0, -1);
+            if(mus_engine > 1)
+            {
+    	        snd_musicdevice = SNDDEVICE_SB;
+		mus_engine--;
 	    }
 	    break;
 	case 1:
-	    if(gamestate != GS_DEMOSCREEN && gamestate != GS_INTERMISSION  && gamestate != GS_FINALE && !demoplayback)
+            if(mus_engine < 2)
 	    {
-		tracknum = 0;
-//		faketracknum = 1;
-		opl = 1;
-		I_OPL_InitMusic();
-//		S_StopMusic();
-		I_StopSong();
-//		if(gamemode != commercial)
-		{
-		    if(!demoplayback)
-			S_StartSong(gamemap - 1, true);
-		    else
-		    {
-			if(gamemode == shareware)
-			    S_StartSong(gamemap, true);
-			else
-			    S_StartSong(gamemap + 9, true);
-		    }
-		}
+                snd_musicdevice = SNDDEVICE_GENMIDI;
+	        mus_engine++;
 	    }
 	    break;
     }
+/*
     if(gamestate == GS_DEMOSCREEN || gamestate == GS_FINALE || gamestate == GS_INTERMISSION || demoplayback)
 	P_SetMessage(&players[consoleplayer], "CANNOT CHANGE STATE IN THIS MODE", true);
+*/
 }
-#endif
+//#endif
 
 //---------------------------------------------------------------------------
 //
@@ -2221,7 +2236,6 @@ static void ClearControls (int cctrlskey)
 
 static void ClearKeys (int option)
 {
-    *doom_defaults_list[19].location = 0;
     *doom_defaults_list[20].location = 0;
     *doom_defaults_list[21].location = 0;
     *doom_defaults_list[22].location = 0;
@@ -2237,26 +2251,29 @@ static void ClearKeys (int option)
     *doom_defaults_list[32].location = 0;
     *doom_defaults_list[33].location = 0;
     *doom_defaults_list[34].location = 0;
+    *doom_defaults_list[35].location = 0;
+    *doom_defaults_list[36].location = 0;
 }
 
 static void ResetKeys (int option)
 {
-    *doom_defaults_list[19].location = CLASSIC_CONTROLLER_R;
-    *doom_defaults_list[20].location = CLASSIC_CONTROLLER_L;
-    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_MINUS;
-    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_LEFT;
-    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_DOWN;
-    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_RIGHT;
-    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_ZL;
-    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_ZR;
-    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_Y;
-    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_A;
-    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_PLUS;
-    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_X;
-    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_B;
-    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_UP;
-    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_HOME;
-    *doom_defaults_list[34].location = CONTROLLER_1;
+    *doom_defaults_list[20].location = CLASSIC_CONTROLLER_R;
+    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_L;
+    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_MINUS;
+    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_LEFT;
+    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_DOWN;
+    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_RIGHT;
+    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_ZL;
+    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_ZR;
+    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_Y;
+    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_A;
+    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_PLUS;
+    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_X;
+    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_B;
+    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_UP;
+    *doom_defaults_list[34].location = CLASSIC_CONTROLLER_HOME;
+    *doom_defaults_list[35].location = CONTROLLER_1;
+    *doom_defaults_list[36].location = CONTROLLER_2;
 }
 
 //---------------------------------------------------------------------------
@@ -2394,7 +2411,7 @@ boolean MN_Responder(event_t * event)
     if (askforkey && data->btns_d)		// KEY BINDINGS
     {
 	ClearControls(event->data1);
-	*doom_defaults_list[keyaskedfor + 19 + FirstKey].location = event->data1;
+	*doom_defaults_list[keyaskedfor + 20 + FirstKey].location = event->data1;
 	askforkey = false;
 	return true;
     }
@@ -2888,8 +2905,7 @@ boolean MN_Responder(event_t * event)
             MN_DeactivateMenu();
             return (true);
         }
-/*
-        else if (key == key_menu_back)         // Go back to previous menu
+        else if (ch == key_menu_back)         // Go back to previous menu
         {
             S_StartSound(NULL, sfx_switch);
             if (CurrentMenu->prevMenu == MENU_NONE)
@@ -2902,6 +2918,7 @@ boolean MN_Responder(event_t * event)
             }
             return (true);
         }
+/*
         else if (charTyped != 0)
         {
             // Jump to menu item based on first letter:
@@ -3384,7 +3401,14 @@ static void SCNTrack(int option)
 #ifdef OGG_SUPPORT
 	if(opl)
 #endif
-	    S_StartSong(tracknum, true);
+	{
+	    if(mus_engine == 2)
+		S_StartSong(tracknum, false);
+	    else if(mus_engine == 1)
+		S_StartSong(tracknum, true);
+
+	    mus_cheat_used = true;
+	}
 #ifdef OGG_SUPPORT
 	else
 	{
@@ -3417,12 +3441,12 @@ static void DrawBindingsMenu(void)
 {
     int ctrls;
 
-    for (ctrls = 0; ctrls < 16; ctrls++)
+    for (ctrls = 0; ctrls < 17; ctrls++)
     {
 	if (askforkey && keyaskedfor == ctrls)
 	    MN_DrTextA("???", 195, (ctrls*10+5));
 	else
-	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+19].location)),195,(ctrls*10+5));
+	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+20].location)),195,(ctrls*10+5));
     }
 
 /*
@@ -3455,17 +3479,17 @@ static void DrawSoundMenu(void)
 #endif
 	{
 	    if(HERETIC_BETA || HERETIC_SHARE_1_0 || HERETIC_SHARE_1_2)
-		MN_DrTextB(songtextbeta[tracknum], 220, 110);
+		MN_DrTextB(songtextbeta[tracknum], 220, 90);
 	    else
-		MN_DrTextB(songtext[tracknum], 220, 110);
+		MN_DrTextB(songtext[tracknum], 220, 90);
 	}
 #ifdef OGG_SUPPORT
 	else
 	{
 	    if(HERETIC_BETA || HERETIC_SHARE_1_0 || HERETIC_SHARE_1_2)
-		MN_DrTextB(songtextbetamp3[tracknum], 220, 110);
+		MN_DrTextB(songtextbetamp3[tracknum], 220, 90);
 	    else
-		MN_DrTextB(songtextmp3[tracknum], 220, 110);
+		MN_DrTextB(songtextmp3[tracknum], 220, 90);
 
 	    if(tracknum == 0)
 		tracknum = 1;
@@ -3473,13 +3497,13 @@ static void DrawSoundMenu(void)
 #endif
     }
     else
-	MN_DrTextB("01", 220, 110);
+	MN_DrTextB("01", 220, 90);
 
 #ifdef OGG_SUPPORT
     if(opl)
-	MN_DrTextB("OPL", 220, 130);
+	MN_DrTextB("OPL", 220, 110);
     else
-	MN_DrTextB("MP3", 220, 130);
+	MN_DrTextB("MP3", 220, 110);
 #endif
 /*
     if(loop)
@@ -3487,6 +3511,15 @@ static void DrawSoundMenu(void)
     else
 	MN_DrTextB("NO", 220, 130);
 */
+    if(mus_engine == 1)
+	MN_DrTextB("OPL", 220, 110);
+    else
+	MN_DrTextB("OGG", 220, 110);
+
+    if(mus_engine < 1)
+	mus_engine = 1;
+    else if(mus_engine > 2)
+	mus_engine = 2;
 }
 /*
 static void SCCpu(int option)

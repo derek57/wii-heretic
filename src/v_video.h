@@ -114,5 +114,7 @@ void V_LoadXlaTable(void);
 
 void V_DrawMouseSpeedBox(int speed);
 
+boolean V_IsPrint(char c);
+
 #endif
 

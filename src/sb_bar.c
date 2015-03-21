@@ -36,6 +36,12 @@
 
 #include "i_swap.h"
 
+#include "c_io.h"
+
+extern char *LevelNames[];
+
+#define SB_TITLE	(LevelNames[(gameepisode-1)*9+gamemap-1])
+
 // Types
 /*
 typedef struct Cheat_s
@@ -1366,3 +1372,18 @@ static void CheatIDDQDFunc(player_t * player, Cheat_t * cheat)
     P_SetMessage(player, DEH_String(TXT_CHEATIDDQD), true);
 }
 */
+
+// sb_newlevel called when we enter a new level
+// determine the level name and display it in
+// the console
+
+void SB_NewLevel()
+{
+    // print the new level name into the console
+    C_Printf("\n");
+    C_Seperator();
+    C_Printf("%s\n\n", SB_TITLE);
+    C_InstaPopup();       // put console away
+//    C_Update();
+}
+

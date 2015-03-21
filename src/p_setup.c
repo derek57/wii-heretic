@@ -35,6 +35,8 @@
 #include "p_local.h"
 #include "s_sound.h"
 
+#include "c_io.h"
+
 void P_SpawnMapThing(mapthing_t * mthing);
 
 int numvertexes;
@@ -68,6 +70,8 @@ byte *rejectmatrix;             // for fast sight rejection
 
 //mapthing_t deathmatchstarts[10], *deathmatch_p;
 mapthing_t playerstarts[MAXPLAYERS];
+
+extern boolean mus_cheat_used;
 
 /*
 =================
@@ -547,6 +551,8 @@ void P_GroupLines(void)
 =================
 */
 
+void SB_NewLevel();
+
 void P_SetupLevel(int episode, int map, int playermask, skill_t skill)
 {
     int i;
@@ -555,7 +561,10 @@ void P_SetupLevel(int episode, int map, int playermask, skill_t skill)
     int lumpnum;
 //    mobj_t *mobj;
 
+    mus_cheat_used = false;
+
     totalkills = totalitems = totalsecret = 0;
+
     for (i = 0; i < MAXPLAYERS; i++)
     {
         players[i].killcount = players[i].secretcount
@@ -649,6 +658,9 @@ void P_SetupLevel(int episode, int map, int playermask, skill_t skill)
 
 //printf ("free memory: 0x%x\n", Z_FreeMemory());
 
+    C_Printf(" SB_NEWLEVEL EXECUTED\n");
+
+    SB_NewLevel();
 }
 
 
