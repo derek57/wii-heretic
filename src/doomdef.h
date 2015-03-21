@@ -846,6 +846,8 @@ int MN_TextBWidth(char *text);
 #define SavePathReg10USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_10"
 #define SavePathReg12USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_12"
 #define SavePathReg13USB "usb:/apps/wiiheretic/savegames/heretic.wad/HTC_R_13"
+#define SavePathRootIWADUSB "usb:/apps/wiiheretic/IWAD"
+#define SavePathRootPWADUSB "usb:/apps/wiiheretic/PWAD"
 #define SavePathRootMusicUSB "usb:/apps/wiiheretic/heretic-music"
 #define SavePathRoot1SD "sd:/apps/wiiheretic/savegames"
 #define SavePathRoot2SD "sd:/apps/wiiheretic/savegames/heretic.wad"
@@ -855,6 +857,8 @@ int MN_TextBWidth(char *text);
 #define SavePathReg10SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_R_10"
 #define SavePathReg12SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_R_12"
 #define SavePathReg13SD "sd:/apps/wiiheretic/savegames/heretic.wad/HTC_R_13"
+#define SavePathRootIWADSD "sd:/apps/wiiheretic/IWAD"
+#define SavePathRootPWADSD "sd:/apps/wiiheretic/PWAD"
 #define SavePathRootMusicSD "sd:/apps/wiiheretic/heretic-music"
 
 #define YEAR ((/*((__DATE__ [7] - '0') * 10 + (__DATE__ [8] - '0')) * 10 \

@@ -2300,6 +2300,14 @@ char *M_GetSaveGameDir(char *iwadname)
 
 	    M_MakeDirectory(savegameroot);
 
+	    savegameroot = SavePathRootIWADUSB;
+
+	    M_MakeDirectory(savegameroot);
+
+	    savegameroot = SavePathRootPWADUSB;
+
+	    M_MakeDirectory(savegameroot);
+
 	    savegameroot = SavePathRootMusicUSB;
 
 	    M_MakeDirectory(savegameroot);
@@ -2311,6 +2319,14 @@ char *M_GetSaveGameDir(char *iwadname)
 	    M_MakeDirectory(savegameroot);
 
 	    savegameroot = SavePathRoot2SD;
+
+	    M_MakeDirectory(savegameroot);
+
+	    savegameroot = SavePathRootIWADSD;
+
+	    M_MakeDirectory(savegameroot);
+
+	    savegameroot = SavePathRootPWADSD;
 
 	    M_MakeDirectory(savegameroot);
 
