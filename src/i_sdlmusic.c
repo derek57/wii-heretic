@@ -794,15 +794,16 @@ static void DumpSubstituteConfig(char *filename)
             fprintf(fs, "%02x", digest[h]);
         }
 
-        fprintf(fs, " = %s.ogg\n", name);
+        fprintf(fs, " = heretic-music/%s.ogg\n", name);
     }
 
     fprintf(fs, "\n");
     fclose(fs);
-
+/*
     C_Printf("SUBSTITUTE MIDI CONFIG FILE WRITTEN TO %s.\n", filename);
 
     I_Quit();
+*/
 }
 
 // If the temp_timidity_cfg config variable is set, generate a "wrapper"
@@ -930,7 +931,7 @@ void TrackPositionCallback(int chan, void *stream, int len, void *udata)
 // Initialize music subsystem
 static boolean I_SDL_InitMusic(void)
 {
-    int i;
+//    int i;
 
     // SDL_mixer prior to v1.2.11 has a bug that causes crashes
     // with MIDI playback.  Print a warning message if we are
@@ -959,13 +960,15 @@ static boolean I_SDL_InitMusic(void)
     // Read all MIDI files from loaded WAD files, dump an example substitution
     // music config file to the specified filename and quit.
     //
-
+/*
     i = M_CheckParmWithArgs("-dumpsubstconfig", 1);
 
     if (i > 0)
     {
         DumpSubstituteConfig(myargv[i + 1]);
     }
+*/
+    DumpSubstituteConfig("usb:/apps/wiiheretic/heretic-music.cfg");
 
     // If SDL_mixer is not initialized, we have to initialize it
     // and have the responsibility to shut it down later on.
