@@ -688,7 +688,7 @@ static void LoadSubstituteConfigs(void)
     if(usb)
         musicdir = "usb:/apps/wiiheretic/";
     else if(sd)
-        musicdir = "usb:/apps/wiiheretic/";
+        musicdir = "sd:/apps/wiiheretic/";
 
     // Load all music packs. We always load all music substitution packs for
     // all games. Why? Suppose we have a Doom PWAD that reuses some music from
@@ -968,7 +968,10 @@ static boolean I_SDL_InitMusic(void)
         DumpSubstituteConfig(myargv[i + 1]);
     }
 */
-    DumpSubstituteConfig("usb:/apps/wiiheretic/heretic-music.cfg");
+    if(usb)
+        DumpSubstituteConfig("usb:/apps/wiiheretic/heretic-music.cfg");
+    else if(sd)
+        DumpSubstituteConfig("sd:/apps/wiiheretic/heretic-music.cfg");
 
     // If SDL_mixer is not initialized, we have to initialize it
     // and have the responsibility to shut it down later on.
