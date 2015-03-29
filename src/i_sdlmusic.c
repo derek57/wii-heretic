@@ -1365,15 +1365,22 @@ static void RestartCurrentTrack(void)
         // Have we reached the actual end of track (not loop end)?
         if (!Mix_PlayingMusic() && current_track_loop)
         {
-//            RestartCurrentTrack();
+//            RestartCurrentTrack();	// FIXME: NOT WORKING CORRECTLY FOR THE WII (WORKAROUND BELOW)
 
 	    change_anyway = true;
 
 	    if(!mus_cheat_used)
+	    {
 		// FIXME: FOR DOOM, THIS WORKS WITHOUT HAVING "- 1" ADDED HERE (MIGHT BE BUGGY)
-		S_StartSong(gamemap - 1, 1);
+		if(gamestate == GS_LEVEL)
+		    S_StartSong(gamemap - 1, true);
+	        else if(gamestate == GS_INTERMISSION)
+		    S_StartSong(mus_intr, true);
+		else if(gamestate == GS_FINALE)
+		    S_StartSong(mus_cptd, true);
+	    }
 	    else
-		S_StartSong(tracknum, 1);
+		S_StartSong(tracknum, true);
         }
     }
 #endif

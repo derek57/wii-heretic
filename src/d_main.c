@@ -323,7 +323,7 @@ void D_DoomLoop(void)
     while (1)
     {
 	// check if the OGG music stopped playing
-	if(gamestate == GS_LEVEL && usergame)
+	if(usergame && gamestate != GS_DEMOSCREEN && gamestate != GS_CONSOLE)
 	    I_SDL_PollMusic();
 
         // Frame syncronous IO operations
