@@ -2883,12 +2883,10 @@ boolean MN_Responder(event_t * event)
                 {
                     /*if (*/item->func(item->option);//)
                     {
-/*
                         if (item->menu != MENU_NONE)
                         {
                             SetMenu(item->menu);
                         }
-*/
                     }
                 }
 		else if (item->type == ITT_SETKEY)

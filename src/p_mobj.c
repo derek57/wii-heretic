@@ -123,6 +123,11 @@ boolean P_SetMobjStateNF(mobj_t * mobj, statenum_t state)
 
 void P_ExplodeMissile(mobj_t * mo)
 {
+/*
+    if(HERETIC_BETA && mobjinfo[mo->type].deathstate == S_REDAXEX1)
+//	return;
+	P_SetMobjState(mo, S_NULL);
+*/
     if (mo->type == MT_WHIRLWIND)
     {
         if (++mo->special2.i < 60)
@@ -131,6 +136,7 @@ void P_ExplodeMissile(mobj_t * mo)
         }
     }
     mo->momx = mo->momy = mo->momz = 0;
+
     P_SetMobjState(mo, mobjinfo[mo->type].deathstate);
     //mo->tics -= P_Random()&3;
     mo->flags &= ~MF_MISSILE;
