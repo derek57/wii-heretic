@@ -56,7 +56,7 @@ static void DrawSoundInfo(void);
 static void ShadeLine(int x, int y, int height, int shade);
 static void ShadeChain(void);
 static void DrINumber(signed int val, int x, int y);
-static void DrBNumber(signed int val, int x, int y);
+//static void DrBNumber(signed int val, int x, int y);
 static void DrawCommonBar(void);
 static void DrawMainBar(void);
 static void DrawInventoryBar(void);
@@ -367,7 +367,7 @@ static void DrINumber(signed int val, int x, int y)
 // Draws a three digit number using FontB
 //
 //---------------------------------------------------------------------------
-
+/*
 static void DrBNumber(signed int val, int x, int y)
 {
     patch_t *patch;
@@ -400,7 +400,7 @@ static void DrBNumber(signed int val, int x, int y)
 //    V_DrawShadowedPatch(xpos + 6 - patch->width / 2, y, patch);		// NOT FOR THE WII
     V_DrawShadowedPatch(xpos + 6 - SHORT(patch->width) / 2, y, patch);		// FIX FOR THE WII
 }
-
+*/
 //---------------------------------------------------------------------------
 //
 // PROC DrSmallNumber
@@ -1004,8 +1004,13 @@ void DrawFullScreenStuff(void)
     int i;
     int x;
 //    int temp;
+    weaponinfo_t    *wpinfo;
+    wpinfo = CPlayer->powers[pw_weaponlevel2] ? &wpnlev2info[0]
+        : &wpnlev1info[0];
+    ammotype_t ammo = wpinfo[CPlayer->readyweapon].ammo;
 
     UpdateState |= I_FULLSCRN;
+/*
     if (CPlayer->mo->health > 0)
     {
         DrBNumber(CPlayer->mo->health, 5, 180);
@@ -1014,7 +1019,7 @@ void DrawFullScreenStuff(void)
     {
         DrBNumber(0, 5, 180);
     }
-/*
+
     if (deathmatch)
     {
         temp = 0;
@@ -1033,8 +1038,8 @@ void DrawFullScreenStuff(void)
         if (CPlayer->readyArtifact > 0)
         {
             patch = DEH_String(patcharti[CPlayer->readyArtifact]);
-            V_DrawTLPatch(286, 170, W_CacheLumpName(DEH_String("ARTIBOX"), PU_CACHE));
-            V_DrawPatch(286, 170, W_CacheLumpName(patch, PU_CACHE));
+            V_DrawTLPatch(288, 168, W_CacheLumpName(DEH_String("ARTIBOX"), PU_CACHE));
+            V_DrawPatch(288, 168, W_CacheLumpName(patch, PU_CACHE));
             DrSmallNumber(CPlayer->inventory[inv_ptr].count, 307, 192);
         }
     }
@@ -1043,31 +1048,62 @@ void DrawFullScreenStuff(void)
         x = inv_ptr - curpos;
         for (i = 0; i < 7; i++)
         {
-            V_DrawTLPatch(50 + i * 31, 168,
+            V_DrawTLPatch(102 + i * 31, 168,
                           W_CacheLumpName(DEH_String("ARTIBOX"), PU_CACHE));
             if (CPlayer->inventorySlotNum > x + i
                 && CPlayer->inventory[x + i].type != arti_none)
             {
                 patch = DEH_String(patcharti[CPlayer->inventory[x + i].type]);
-                V_DrawPatch(50 + i * 31, 168, 
+                V_DrawPatch(102 + i * 31, 168, 
                             W_CacheLumpName(patch, PU_CACHE));
-                DrSmallNumber(CPlayer->inventory[x + i].count, 69 + i * 31,
+                DrSmallNumber(CPlayer->inventory[x + i].count, 121 + i * 31,
                               190);
             }
         }
-        V_DrawPatch(50 + curpos * 31, 197, PatchSELECTBOX);
+        V_DrawPatch(102 + curpos * 31, 197, PatchSELECTBOX);
 
         if (x != 0)
         {
-            V_DrawPatch(38, 167, !(leveltime & 4) ? PatchINVLFGEM1 :
+            V_DrawPatch(103, 168, !(leveltime & 4) ? PatchINVLFGEM1 :
                         PatchINVLFGEM2);
         }
 
         if (CPlayer->inventorySlotNum - x > 7)
         {
-            V_DrawPatch(269, 167, !(leveltime & 4) ?
+            V_DrawPatch(308, 168, !(leveltime & 4) ?
                         PatchINVRTGEM1 : PatchINVRTGEM2);
         }
+    }
+
+    // health
+    MN_DrTextA("HEALTH:", 2, 169);
+    DrINumber(CPlayer->mo->health, 50, 167);
+
+    // armor
+    MN_DrTextA("ARMOR:", 2, 179);
+    DrINumber(CPlayer->armorpoints, 50, 177);
+
+    // ammo
+    MN_DrTextA("AMMO:", 2, 189);
+    if (CPlayer->readyweapon != wp_staff &&
+        CPlayer->readyweapon != wp_gauntlets &&
+        CPlayer->readyweapon != wp_beak)
+    {
+        DrINumber(CPlayer->ammo[ammo], 50, 187);
+    }
+
+    // keys
+    if (CPlayer->keys[key_yellow])
+    {
+        V_DrawPatch(84, 170, W_CacheLumpName(DEH_String("ykeyicon"), PU_CACHE));
+    }
+    if (CPlayer->keys[key_green])
+    {
+        V_DrawPatch(84, 180, W_CacheLumpName(DEH_String("gkeyicon"), PU_CACHE));
+    }
+    if (CPlayer->keys[key_blue])
+    {
+        V_DrawPatch(84, 190, W_CacheLumpName(DEH_String("bkeyicon"), PU_CACHE));
     }
 }
 
