@@ -1906,7 +1906,7 @@ void A_WhirlwindSeek(mobj_t * actor)
 
 void A_HeadIceImpact(mobj_t * ice)
 {
-    int i;
+    unsigned int i;
     angle_t angle;
     mobj_t *shard;
 
@@ -2521,7 +2521,7 @@ void A_VolcanoBlast(mobj_t * volcano)
 
 void A_VolcBallImpact(mobj_t * ball)
 {
-    int i;
+    unsigned int i;
     mobj_t *tiny;
     angle_t angle;
 
