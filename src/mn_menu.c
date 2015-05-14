@@ -189,6 +189,7 @@ static void SCWeaponD(int option);
 static void SCWeaponE(int option);
 static void SCWeaponF(int option);
 static void SCWeaponG(int option);
+static void SCWeaponH(int option);
 static void SCAmmo(int option);
 static void SCKeys(int option);
 static void SCYellow(int option);
@@ -941,7 +942,8 @@ static MenuItem_t WeaponsItems[] = {
     {ITT_EFUNC, "DRAGON CLAW", SCWeaponC, 0, MENU_NONE},
     {ITT_EFUNC, "HELLSTAFF", SCWeaponD, 0, MENU_NONE},
     {ITT_EFUNC, "PHOENIX ROD", SCWeaponE, 0, MENU_NONE},
-    {ITT_EFUNC, "FIREMACE", SCWeaponF, 0, MENU_NONE}
+    {ITT_EFUNC, "FIREMACE", SCWeaponF, 0, MENU_NONE},
+    {ITT_EFUNC, "BACKPACK", SCWeaponH, 0, MENU_NONE}
 };
 
 static MenuItem_t ArtifactsItems[] = {
@@ -1008,7 +1010,7 @@ static Menu_t ArmorMenu = {
 static Menu_t WeaponsMenu = {
     70, 50,
     DrawWeaponsMenu,
-    10, WeaponsItems,
+    11, WeaponsItems,
     0,
     MENU_CHEATS
 };
@@ -4289,6 +4291,27 @@ static void SCWeaponG(int option)
     S_StartSound(NULL, sfx_chat);
 }
 
+static void SCWeaponH(int option)
+{
+    if(!demoplayback && gamestate == GS_LEVEL && gameskill != sk_nightmare && players[consoleplayer].playerstate == PST_LIVE)
+    {
+        int i;
+
+	static player_t* player;
+	player = &players[consoleplayer];
+
+        if (!player->backpack)
+        {
+            for (i = 0; i < NUMAMMO; i++)
+            {
+                player->maxammo[i] *= 2;
+            }
+            player->backpack = true;
+        }
+	P_SetMessage(player, DEH_String("BACKPACK ADDED"), false);
+    }
+}
+
 static void SCAmmo(int option)
 {
     if(!demoplayback && gamestate == GS_LEVEL && gameskill != sk_nightmare && players[consoleplayer].playerstate == PST_LIVE)
@@ -4298,14 +4321,6 @@ static void SCAmmo(int option)
 	static player_t* player;
 	player = &players[consoleplayer];
 
-	if (!player->backpack)
-	{
-	    for (i = 0; i < NUMAMMO; i++)
-    	    {
-		player->maxammo[i] *= 2;
-    	    }
-    	    player->backpack = true;
-    	}
 	for (i = 0; i < NUMAMMO; i++)
     	{
     	    player->ammo[i] = player->maxammo[i];
