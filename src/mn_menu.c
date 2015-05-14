@@ -157,6 +157,7 @@ static void SCJumping(int option);
 static void SCStats(int option);
 static void SCMouselook(int option);
 static void SCWeaponRecoil(int option);
+static void SCRespawnMonsters(int option);
 
 static void SCArtifact(int option);
 static void SCQuartz(int option);
@@ -332,8 +333,8 @@ int rmap = 1;
 int rskill = 0;
 int mus_engine = 1;
 
-int key_bindings_start_in_cfg_at_pos = 21;
-int key_bindings_end_in_cfg_at_pos = 38;
+int key_bindings_start_in_cfg_at_pos = 22;
+int key_bindings_end_in_cfg_at_pos = 39;
 /*
 int memory_info = 0;
 int battery_info = 0;
@@ -878,13 +879,14 @@ static MenuItem_t GameItems[] = {
     {ITT_EFUNC, "", SCCrosshair, 0, MENU_NONE},
     {ITT_EFUNC, "", SCJumping, 0, MENU_NONE},
     {ITT_EFUNC, "", SCWeaponChange, 0, MENU_NONE},
-    {ITT_LRFUNC, "", SCWeaponRecoil, 0, MENU_NONE}
+    {ITT_LRFUNC, "", SCWeaponRecoil, 0, MENU_NONE},
+    {ITT_LRFUNC, "", SCRespawnMonsters, 0, MENU_NONE}
 };
 
 static Menu_t GameMenu = {
     65, 10,
     DrawGameMenu,
-    9, GameItems,
+    10, GameItems,
     0,
     MENU_OPTIONS
 };
@@ -1859,6 +1861,11 @@ static void DrawGameMenu(void)
 	MN_DrTextA("ON", 235, 90);
     else
 	MN_DrTextA("OFF", 235, 90);
+
+    if(respawnparm)
+	MN_DrTextA("ON", 235, 100);
+    else
+	MN_DrTextA("OFF", 235, 100);
 }
 
 //---------------------------------------------------------------------------
@@ -2309,7 +2316,6 @@ static void ClearControls (int cctrlskey)
 
 static void ClearKeys (int option)
 {
-    *doom_defaults_list[21].location = 0;
     *doom_defaults_list[22].location = 0;
     *doom_defaults_list[23].location = 0;
     *doom_defaults_list[24].location = 0;
@@ -2326,27 +2332,28 @@ static void ClearKeys (int option)
     *doom_defaults_list[35].location = 0;
     *doom_defaults_list[36].location = 0;
     *doom_defaults_list[37].location = 0;
+    *doom_defaults_list[38].location = 0;
 }
 
 static void ResetKeys (int option)
 {
-    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_R;
-    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_L;
-    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_MINUS;
-    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_LEFT;
-    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_DOWN;
-    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_RIGHT;
-    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_ZL;
-    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_ZR;
-    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_Y;
-    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_A;
-    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_PLUS;
-    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_X;
-    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_B;
-    *doom_defaults_list[34].location = CLASSIC_CONTROLLER_UP;
-    *doom_defaults_list[35].location = CLASSIC_CONTROLLER_HOME;
-    *doom_defaults_list[36].location = CONTROLLER_1;
-    *doom_defaults_list[37].location = CONTROLLER_2;
+    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_R;
+    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_L;
+    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_MINUS;
+    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_LEFT;
+    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_DOWN;
+    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_RIGHT;
+    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_ZL;
+    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_ZR;
+    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_Y;
+    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_A;
+    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_PLUS;
+    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_X;
+    *doom_defaults_list[34].location = CLASSIC_CONTROLLER_B;
+    *doom_defaults_list[35].location = CLASSIC_CONTROLLER_UP;
+    *doom_defaults_list[36].location = CLASSIC_CONTROLLER_HOME;
+    *doom_defaults_list[37].location = CONTROLLER_1;
+    *doom_defaults_list[38].location = CONTROLLER_2;
 }
 
 //---------------------------------------------------------------------------
@@ -2484,7 +2491,7 @@ boolean MN_Responder(event_t * event)
     if (askforkey && data->btns_d)		// KEY BINDINGS
     {
 	ClearControls(event->data1);
-	*doom_defaults_list[keyaskedfor + 21 + FirstKey].location = event->data1;
+	*doom_defaults_list[keyaskedfor + 22 + FirstKey].location = event->data1;
 	askforkey = false;
 	return true;
     }
@@ -2899,7 +2906,7 @@ boolean MN_Responder(event_t * event)
 		{
 		    if (FirstKey == 0)
 		    {
-			CurrentItPos = 20; // End of Key menu (14 == 15 (max lines on a page) - 1)
+			CurrentItPos = 21; // End of Key menu (14 == 15 (max lines on a page) - 1)
 			FirstKey = FIRSTKEY_MAX;
 		    }
 		    else
@@ -3354,6 +3361,25 @@ static void SCWeaponRecoil(int option)
     }
 }
 
+static void SCRespawnMonsters(int option)
+{
+    if(option == RIGHT_DIR)
+    {
+        if (!respawnparm)
+        {
+            start_respawnparm = true;
+            respawnparm = true;
+        }
+        players[consoleplayer].message = DEH_String("MONSTER RESPAWNING ENABLED");
+    }
+    else if(respawnparm)
+    {
+        start_respawnparm = false;
+        respawnparm = false;
+        players[consoleplayer].message = DEH_String("MONSTER RESPAWNING DISABLED");
+    }
+}
+
 static void SCMouseSpeed(int option)
 {
     if(option == RIGHT_DIR)
@@ -3532,7 +3558,7 @@ static void DrawBindingsMenu(void)
 	if (askforkey && keyaskedfor == ctrls)
 	    MN_DrTextA("???", 195, (ctrls*10+5));
 	else
-	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+21].location)),195,(ctrls*10+5));
+	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+22].location)),195,(ctrls*10+5));
     }
 
 /*

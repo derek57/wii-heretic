@@ -2009,6 +2009,8 @@ void G_DeferedInitNew(skill_t skill, int episode, int map)
 
 void G_DoNewGame(void)
 {
+    respawnparm = start_respawnparm;
+
     G_InitNew(d_skill, d_episode, d_map);
     gameaction = ga_nothing;
 }
@@ -2286,6 +2288,7 @@ boolean G_CheckDemoStatus(void)
 
         W_ReleaseLumpName(defdemoname);
         demoplayback = false;
+        respawnparm = start_respawnparm;
         D_AdvanceDemo();
         return true;
     }

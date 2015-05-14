@@ -286,6 +286,7 @@ extern	int		rndindex;
 
 extern  ticcmd_t       *netcmds;
 
-extern boolean		d_recoil;
+extern  boolean		d_recoil;
+extern  boolean		start_respawnparm;
 
 #endif

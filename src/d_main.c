@@ -88,6 +88,8 @@ boolean do_not_repeat_music = false;
 boolean nomonsters;             // checkparm of -nomonsters
 boolean respawnparm;            // checkparm of -respawn
 
+boolean start_respawnparm;
+
 extern boolean debugmode /*= false*/;	// checkparm of -debug
 /*
 boolean ravpic;                 // checkparm of -ravpic
@@ -1177,6 +1179,8 @@ void D_DoomMain(void)
     M_SetConfigFilenames("heretic.cfg"/*, PROGRAM_PREFIX "heretic.cfg"*/);
     M_LoadDefaults();
 
+    respawnparm = false;
+
     if(mus_engine > 1)
 	mus_engine = 2;
     else if(mus_engine < 2)
@@ -1321,6 +1325,8 @@ void D_DoomMain(void)
 */
     I_InitTimer();
     D_ConnectNetGame();
+
+    start_respawnparm = respawnparm;
 /*
     // haleyjd: removed WATCOMC
     initStartup();
