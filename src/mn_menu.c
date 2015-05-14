@@ -215,6 +215,7 @@ static void SCVersion(int option);
 //#ifdef OGG_SUPPORT
 static void SCMusicType(int option);
 //#endif
+static void SCSoundChans(int option);
 static void SCSound(int option);
 static void SCCoords(int option);
 static void SCMapname(int option);
@@ -315,6 +316,7 @@ boolean inside_menu = false;		// WII INVENTORY UPSTREAM FIX #3
 boolean mus_cheat_used = false;
 boolean d_recoil = true;
 boolean autoaim = true;
+boolean swap_sound_chans = false;
 
 int ninty;
 int FramesPerSecond;
@@ -337,8 +339,8 @@ int rmap = 1;
 int rskill = 0;
 int mus_engine = 1;
 
-int key_bindings_start_in_cfg_at_pos = 24;
-int key_bindings_end_in_cfg_at_pos = 41;
+int key_bindings_start_in_cfg_at_pos = 25;
+int key_bindings_end_in_cfg_at_pos = 42;
 /*
 int memory_info = 0;
 int battery_info = 0;
@@ -830,16 +832,17 @@ static MenuItem_t SoundItems[] = {
     {ITT_LRFUNC, "CHOOSE TRACK :", SCNTrack, 0, MENU_NONE}
 //#ifdef OGG_SUPPORT
     ,
-    {ITT_LRFUNC, "MUSIC TYPE :", SCMusicType, 0, MENU_NONE}
+    {ITT_LRFUNC, "MUSIC TYPE :", SCMusicType, 0, MENU_NONE},
 //#endif
     /*,{ITT_LRFUNC, "LOOP TRACK :", SCNTrackLoop, 0, MENU_NONE}*/
+    {ITT_LRFUNC, "SWAP CHANS :", SCSoundChans, 0, MENU_NONE}
 };
 
 static Menu_t SoundMenu = {
     75, 10,
     DrawSoundMenu,
 //#ifdef OGG_SUPPORT
-    6, SoundItems,
+    7, SoundItems,
 //#else
 //    5, SoundItems,
 //#endif
@@ -2217,6 +2220,29 @@ static void SCMusicType(int option)
 }
 //#endif
 
+static void SCSoundChans(int option)
+{
+    switch(option)
+    {
+	case 0:
+            if(swap_sound_chans)
+            {
+		swap_sound_chans = false;
+	    }
+	    break;
+	case 1:
+            if(!swap_sound_chans)
+	    {
+		swap_sound_chans = true;
+	    }
+	    break;
+    }
+/*
+    if(gamestate == GS_DEMOSCREEN || gamestate == GS_FINALE || gamestate == GS_INTERMISSION || demoplayback)
+	P_SetMessage(&players[consoleplayer], "CANNOT CHANGE STATE IN THIS MODE", true);
+*/
+}
+
 //---------------------------------------------------------------------------
 //
 // PROC SCScreenSize
@@ -2336,7 +2362,6 @@ static void ClearControls (int cctrlskey)
 
 static void ClearKeys (int option)
 {
-    *doom_defaults_list[24].location = 0;
     *doom_defaults_list[25].location = 0;
     *doom_defaults_list[26].location = 0;
     *doom_defaults_list[27].location = 0;
@@ -2353,27 +2378,28 @@ static void ClearKeys (int option)
     *doom_defaults_list[38].location = 0;
     *doom_defaults_list[39].location = 0;
     *doom_defaults_list[40].location = 0;
+    *doom_defaults_list[41].location = 0;
 }
 
 static void ResetKeys (int option)
 {
-    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_R;
-    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_L;
-    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_MINUS;
-    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_LEFT;
-    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_DOWN;
-    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_RIGHT;
-    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_ZL;
-    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_ZR;
-    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_Y;
-    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_A;
-    *doom_defaults_list[34].location = CLASSIC_CONTROLLER_PLUS;
-    *doom_defaults_list[35].location = CLASSIC_CONTROLLER_X;
-    *doom_defaults_list[36].location = CLASSIC_CONTROLLER_B;
-    *doom_defaults_list[37].location = CLASSIC_CONTROLLER_UP;
-    *doom_defaults_list[38].location = CLASSIC_CONTROLLER_HOME;
-    *doom_defaults_list[39].location = CONTROLLER_1;
-    *doom_defaults_list[40].location = CONTROLLER_2;
+    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_R;
+    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_L;
+    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_MINUS;
+    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_LEFT;
+    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_DOWN;
+    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_RIGHT;
+    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_ZL;
+    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_ZR;
+    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_Y;
+    *doom_defaults_list[34].location = CLASSIC_CONTROLLER_A;
+    *doom_defaults_list[35].location = CLASSIC_CONTROLLER_PLUS;
+    *doom_defaults_list[36].location = CLASSIC_CONTROLLER_X;
+    *doom_defaults_list[37].location = CLASSIC_CONTROLLER_B;
+    *doom_defaults_list[38].location = CLASSIC_CONTROLLER_UP;
+    *doom_defaults_list[39].location = CLASSIC_CONTROLLER_HOME;
+    *doom_defaults_list[40].location = CONTROLLER_1;
+    *doom_defaults_list[41].location = CONTROLLER_2;
 }
 
 //---------------------------------------------------------------------------
@@ -2511,7 +2537,7 @@ boolean MN_Responder(event_t * event)
     if (askforkey && data->btns_d)		// KEY BINDINGS
     {
 	ClearControls(event->data1);
-	*doom_defaults_list[keyaskedfor + 24 + FirstKey].location = event->data1;
+	*doom_defaults_list[keyaskedfor + 25 + FirstKey].location = event->data1;
 	askforkey = false;
 	return true;
     }
@@ -2926,7 +2952,7 @@ boolean MN_Responder(event_t * event)
 		{
 		    if (FirstKey == 0)
 		    {
-			CurrentItPos = 23; // End of Key menu (14 == 15 (max lines on a page) - 1)
+			CurrentItPos = 24; // End of Key menu (14 == 15 (max lines on a page) - 1)
 			FirstKey = FIRSTKEY_MAX;
 		    }
 		    else
@@ -3614,7 +3640,7 @@ static void DrawBindingsMenu(void)
 	if (askforkey && keyaskedfor == ctrls)
 	    MN_DrTextA("???", 195, (ctrls*10+5));
 	else
-	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+24].location)),195,(ctrls*10+5));
+	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+25].location)),195,(ctrls*10+5));
     }
 
 /*
@@ -3683,6 +3709,11 @@ static void DrawSoundMenu(void)
 	MN_DrTextB("OPL", 220, 110);
     else
 	MN_DrTextB("OGG", 220, 110);
+
+    if(swap_sound_chans)
+	MN_DrTextB("ON", 220, 130);
+    else
+	MN_DrTextB("OFF", 220, 130);
 
     if(mus_engine < 1)
 	mus_engine = 1;

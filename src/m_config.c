@@ -183,6 +183,7 @@ extern int key_invright, key_invuse;
     CONFIG_VARIABLE_INT		(monsters_respawn),
     CONFIG_VARIABLE_INT		(monsters_fast),
     CONFIG_VARIABLE_INT		(auto_aim),
+    CONFIG_VARIABLE_INT		(swap_channels),
     CONFIG_VARIABLE_INT		(key_fire),
     CONFIG_VARIABLE_INT		(key_use),
     CONFIG_VARIABLE_INT		(key_menu),
