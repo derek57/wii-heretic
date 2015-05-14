@@ -19,6 +19,7 @@
 
 #include <unistd.h>
 
+int M_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args);
 /*
 u8 getTextBoxRow(u8 chRow) {
     return (chRow==AUTOSIZE)?getConsoleRow():chRow;
@@ -31,7 +32,7 @@ static char strTextBuffer[1024];
 va_list pArguments;
 unsigned intLinesCount,intMaxColumn;
     va_start(pArguments,strFormatValue);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
     va_end(pArguments);
     intLinesCount=getLinesCount(strTextBuffer,&intMaxColumn);
     return intMaxColumn+((BORDER_TYPE & RIGHT_BORDER)/RIGHT_BORDER)+((BORDER_TYPE & LEFT_BORDER)/LEFT_BORDER);
@@ -41,7 +42,7 @@ static char strTextBuffer[1024];
 va_list pArguments;
 unsigned intMaxColumn;
     va_start(pArguments,strFormatValue);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
     va_end(pArguments);
     return getLinesCount(strTextBuffer,&intMaxColumn)+((BORDER_TYPE & TOP_BORDER)/TOP_BORDER)+((BORDER_TYPE & BOTTOM_BORDER)/BOTTOM_BORDER);
 }
@@ -49,7 +50,7 @@ void getTextBoxPositions(u8 *chMinRow,u8 *chMinColumn,u8 *chMaxRow,u8 *chMaxColu
 static char strTextBuffer[1024];
 va_list pArguments;
     va_start(pArguments,strFormatValue);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
     va_end(pArguments);
     *chMinRow=getTextBoxRow(*chMinRow);
     *chMinColumn=getTextBoxColumn(*chMinColumn);
@@ -80,7 +81,7 @@ void printRepeatString(unsigned int intRepeatsCount,const char *strFormatValue,.
 static char strTextBuffer[1024];
 va_list pArguments;
     va_start(pArguments,strFormatValue);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
     va_end(pArguments);
     while (intRepeatsCount) {
         intRepeatsCount--;
@@ -95,7 +96,7 @@ va_list pArguments;
     stTexteLocation->intRow=getTextBoxRow(chRow);
     setCursorPosition(stTexteLocation->intRow,stTexteLocation->intColumn);
     va_start(pArguments,strTexteFormat);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
     va_end(pArguments);
     printf("%s",strTextBuffer);
     saveCursorPosition();
@@ -107,7 +108,7 @@ va_list pArguments;
         permutePointers((void *) &chMinColumn,(void *) &chMaxColumn);
     }
     va_start(pArguments,strTexteFormat);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
     va_end(pArguments);
     if (isInRange(chColumn,(double) chMinColumn-strlen(strTextBuffer)+1,chMaxColumn,true,true)) {
         if (chColumn>chMinColumn) {
@@ -127,7 +128,7 @@ unsigned int intBreakLinesCount;
 char **strBreakLines;
 double dbTextContainerX[2]={0,0},dbTextContainerY[2]={0,0};
     va_start(pArguments,strTexteFormat);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
     va_end(pArguments);
     if (chMinColumn>chMaxColumn) {
         permutePointers((void *) &chMinColumn,(void *) &chMaxColumn);
@@ -180,7 +181,7 @@ static char strTextBuffer[1024];
 va_list pArguments;
     setFontStyle(FONT_BGCOLOR,FONT_FGCOLOR,FONT_WEIGHT);
     va_start(pArguments,fmt);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),fmt,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),fmt,pArguments);
     va_end(pArguments);
     printLocatedText(chRow,chColumn,stTexteLocation,"%s",strTextBuffer);
     resetPreviousFontStyle();
@@ -189,7 +190,7 @@ void printAlignedStyledText(double dbColumn,double dbRow,u8 chMinRow,u8 chMinCol
 static char strTextBuffer[1024];
 va_list pArguments;
     va_start(pArguments,strTexteFormat);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strTexteFormat,pArguments);
     va_end(pArguments);
     setFontStyle(FONT_BGCOLOR,FONT_FGCOLOR,FONT_WEIGHT);
     printAlignedText(dbColumn,dbRow,chMinRow,chMinColumn,chMaxRow,chMaxColumn,blnMultiLine,blnHideOverflowText,stTexteLocation,"%s",strTextBuffer);
@@ -390,7 +391,7 @@ static char strTextBuffer[1024];
 int intMinRow,intMaxRow,intMinColumn,intMaxColumn;
 va_list pArguments;
     va_start(pArguments,strFormatValue);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
     va_end(pArguments);
     getTextBoxPositions(&chMinRow,&chMinColumn,&chMaxRow,&chMaxColumn,BORDER_TYPE,"%s",strTextBuffer);
     intMinRow=chMinRow+(BORDER_TYPE & TOP_BORDER)/TOP_BORDER;
@@ -407,7 +408,7 @@ static char strTextBuffer[1024];
 va_list pArguments;
 double dbTextContainerX[2]={dbColumn,dbColumn},dbTextContainerY[2]={dbRow,dbRow};
     va_start(pArguments,strFormatValue);
-    vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
+    M_vsnprintf(strTextBuffer,sizeof(strTextBuffer),strFormatValue,pArguments);
     va_end(pArguments);
     if (chFrameMinRow>chFrameMaxRow) {
         permutePointers((void *) &chFrameMinRow,(void *) &chFrameMaxRow);
@@ -453,7 +454,7 @@ va_list pArguments;
 unsigned char chLabelLength;
     saveCursorPosition();
     va_start(pArguments,strFormatLabel);
-    vsnprintf(strLabelText,chLabelSize+1,strFormatLabel,pArguments);
+    M_vsnprintf(strLabelText,chLabelSize+1,strFormatLabel,pArguments);
     va_end(pArguments);
     setCursorPosition(getTextBoxRow(chRow),getTextBoxColumn(chColumn));
     setFontStyle(FONT_BGCOLOR,FONT_FGCOLOR,FONT_WEIGHT);
@@ -468,7 +469,7 @@ void drawProgressBar(u8 chProgressBarRow,u8 chProgressBarColumn,u8 chProgressBar
 static char strLabel[51];
 va_list pArguments;
     va_start(pArguments,strFormatLabel);
-    vsnprintf(strLabel,sizeof(strLabel),strFormatLabel,pArguments);
+    M_vsnprintf(strLabel,sizeof(strLabel),strFormatLabel,pArguments);
     va_end(pArguments);
     printStyledText(chProgressBarRow,chProgressBarColumn,FONT_BGCOLOR,FONT_FGCOLOR,FONT_WEIGHT,stProgressBarLabelLocation,"%s",strLabel);
     printf(" ");
@@ -497,7 +498,7 @@ va_list pArguments;
         resetPreviousBgColor();
         resetSavedCursorPosition();
         va_start(pArguments,strFormatProgressBarText);
-        vsnprintf(strProgressBarText,stProgressBarSettings->chProgressBarTextSize+1,strFormatProgressBarText,pArguments);
+        M_vsnprintf(strProgressBarText,stProgressBarSettings->chProgressBarTextSize+1,strFormatProgressBarText,pArguments);
         va_end(pArguments);
         printLabel(stProgressBarSettings->stProgressBarTextLocation.intRow,stProgressBarSettings->stProgressBarTextLocation.intColumn,FONT_BGCOLOR,FONT_FGCOLOR,FONT_WEIGHT,stProgressBarSettings->chProgressBarTextSize,&stTexteLocation,"%s",strProgressBarText);
     }
@@ -566,7 +567,7 @@ static char strCellText[1024];
 va_list pArguments;
     if ((chRow<stTableSettings->chRowsCount) && (chColumn<stTableSettings->chColumnsCount)) {
         va_start(pArguments,strFormatCellText);
-        vsnprintf(strCellText,sizeof(strCellText),strFormatCellText,pArguments);
+        M_vsnprintf(strCellText,sizeof(strCellText),strFormatCellText,pArguments);
         va_end(pArguments);
         printTextBox(1+stTableSettings->stTableLocation.intRow+chRow*stTableSettings->chCellHeight,1+stTableSettings->stTableLocation.intColumn+stTableSettings->chCellWidth*chColumn,stTableSettings->stTableLocation.intRow+(chRow+1)*stTableSettings->chCellHeight-1,stTableSettings->stTableLocation.intColumn+stTableSettings->chCellWidth*(chColumn+1)-1,dbHorizontalAlign,dbVerticalAlign,NO_BORDER,stTableSettings->BORDER_STYLE,stTableSettings->BORDER_COLOR,NO_JUNCTION,NO_JUNCTION,NO_JUNCTION,NO_JUNCTION,BGCOLOR,FONT_COLOR,FONT_WEIGHT,true,true,stCellTextLocation,"%s",strCellText);
     }
@@ -670,7 +671,7 @@ va_list pArguments;
 static char strBlinkText[1024];
 struct stConsoleCursorLocation stTexteLocation;
     va_start(pArguments,strFormatBlinkText);
-    vsnprintf(strBlinkText,sizeof(strBlinkText),strFormatBlinkText,pArguments);
+    M_vsnprintf(strBlinkText,sizeof(strBlinkText),strFormatBlinkText,pArguments);
     va_end(pArguments);
     stBlinkTextSettings->strBlinkText=getCloneString(strBlinkText);
     stBlinkTextSettings->stTextLocation.intColumn=getTextBoxColumn(chColumn);
@@ -715,7 +716,7 @@ void printDynamicStyledText(u8 chRow,u8 chColumn,enum CONSOLE_FONT_COLORS FONT_B
 va_list pArguments;
 static char strDynamicStyledText[256];
     va_start(pArguments,strFormatText);
-    vsnprintf(strDynamicStyledText,sizeof(strDynamicStyledText),strFormatText,pArguments);
+    M_vsnprintf(strDynamicStyledText,sizeof(strDynamicStyledText),strFormatText,pArguments);
     va_end(pArguments);
     stDynamicStyledTextSettings->strDynamicStyledText=getCloneString(strDynamicStyledText);
     printStyledText(chRow,chColumn,FONT_BGCOLOR,FONT_FGCOLOR,FONT_WEIGHT,&stDynamicStyledTextSettings->stDynamicStyledTextLocation,"%s",strDynamicStyledText);
@@ -764,7 +765,7 @@ static char strStatusText[256];
 struct stConsoleCursorLocation stConcatLabelLocation;
     if (stCommandsBarSettings->stStatusBarLocation.intRow!=-1) {
         va_start(pArguments,strFormatText);
-        vsnprintf(strStatusText,sizeof(strStatusText),strFormatText,pArguments);
+        M_vsnprintf(strStatusText,sizeof(strStatusText),strFormatText,pArguments);
         va_end(pArguments);
         printLabel(stCommandsBarSettings->stStatusBarLocation.intRow,stCommandsBarSettings->stStatusBarLocation.intColumn,BGCOLOR,FONT_COLOR,FONT_WEIGHT,getConsoleColumnsCount()-1,&stConcatLabelLocation,"%s",strStatusText);
     }
@@ -788,7 +789,7 @@ static char strCommandText[256];
         }
         if (chColumnCounts>0) {
             va_start(pArguments,strFormatText);
-            vsnprintf(strCommandText,sizeof(strCommandText),strFormatText,pArguments);
+            M_vsnprintf(strCommandText,sizeof(strCommandText),strFormatText,pArguments);
             va_end(pArguments);
             printf("%-*.*s",(unsigned int) chColumnCounts,(unsigned int) chColumnCounts,strCommandText);
         }

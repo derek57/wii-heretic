@@ -142,9 +142,8 @@ extern boolean mus_cheat_used;
 extern boolean usb;
 extern boolean sd;
 
-// [SVE]
-//#define SVE_USE_RWOPS_MUSIC	// FIXME: M_ReadFile CRASHES THE WII WHEN USING "CHANGE MUSIC" CHEAT
-#if defined(SVE_USE_RWOPS_MUSIC)
+//#define USE_RWOPS_MUSIC	// FIXME: M_ReadFile CRASHES THE WII WHEN USING "CHANGE MUSIC" CHEAT
+#if defined(USE_RWOPS_MUSIC)
 static SDL_RWops *rw_music_cache;
 static void      *rw_music_data;
 #endif
@@ -504,14 +503,14 @@ static char *GetFullPath(char *base_filename, char *path)
     // so just return it.
     if (path[0] == DIR_SEPARATOR)
     {
-        return M_Strdup(path);
+        return M_StringDuplicate(path);
     }
 
 #ifdef _WIN32
     // d:\path\...
     if (isalpha(path[0]) && path[1] == ':' && path[2] == DIR_SEPARATOR)
     {
-        return M_Strdup(path);
+        return M_StringDuplicate(path);
     }
 #endif
 
@@ -522,7 +521,7 @@ static char *GetFullPath(char *base_filename, char *path)
 
     // Copy config filename and cut off the filename to just get the
     // parent dir.
-    basedir = M_Strdup(base_filename);
+    basedir = M_StringDuplicate(base_filename);
     p = strrchr(basedir, DIR_SEPARATOR);
     if (p != NULL)
     {
@@ -531,7 +530,7 @@ static char *GetFullPath(char *base_filename, char *path)
     }
     else
     {
-        result = M_Strdup(path);
+        result = M_StringDuplicate(path);
     }
     free(basedir);
     free(path);
@@ -657,6 +656,8 @@ static boolean ReadSubstituteConfig(char *filename)
 
         if (error != NULL)
         {
+            M_ForceUppercase(filename);
+            M_ForceUppercase(error);
             C_Printf("%s:%i: ERROR: %s\n", filename, linenum, error);
         }
 
@@ -678,7 +679,7 @@ static void LoadSubstituteConfigs(void)
 /*
     if (!strcmp(configdir, ""))
     {
-        musicdir = M_Strdup("");
+        musicdir = M_StringDuplicate("");
     }
     else
     {
@@ -702,12 +703,12 @@ static void LoadSubstituteConfigs(void)
         free(path);
     }
 
-    // [SVE]: try also cwd
+    // try also cwd
     if(*musicdir)
     {    
         for (i = 0; i < arrlen(subst_config_filenames); ++i)
         {
-            path = M_Strdup(subst_config_filenames[i]);
+            path = M_StringDuplicate(subst_config_filenames[i]);
             ReadSubstituteConfig(path);
             free(path);
         }
@@ -774,7 +775,7 @@ static void DumpSubstituteConfig(char *filename)
 
     for (lumpnum = 0; lumpnum < numlumps; ++lumpnum)
     {
-        strncpy(name, lumpinfo[lumpnum].name, 8);
+        M_StringCopy(name, lumpinfo[lumpnum].name, 9);
         name[8] = '\0';
 
         if (!IsMusicLump(lumpnum))
@@ -837,7 +838,7 @@ static boolean WriteWrapperTimidityConfig(char *write_path)
     p = strrchr(timidity_cfg_path, DIR_SEPARATOR);
     if (p != NULL)
     {
-        path = M_Strdup(timidity_cfg_path);
+        path = M_StringDuplicate(timidity_cfg_path);
         path[p - timidity_cfg_path] = '\0';
         fprintf(fstream, "dir %s\n", path);
         free(path);
@@ -1094,7 +1095,7 @@ static void I_SDL_PlaySong(void *handle, boolean looping)
     // Don't loop when playing substitute music, as we do it
     // ourselves instead.
 
-#if !defined(SVE_USE_RWOPS_MUSIC)
+#if !defined(USE_RWOPS_MUSIC)
     if (playing_substitute && file_metadata.valid)
     {
 //        loops = 1;		// FIXME: WTF ???
@@ -1159,7 +1160,7 @@ static void I_SDL_UnRegisterSong(void *handle)
 
     Mix_FreeMusic(music);
 
-#if defined(SVE_USE_RWOPS_MUSIC)
+#if defined(USE_RWOPS_MUSIC)
     rw_music_cache = NULL;
     if(rw_music_data)
     {
@@ -1204,6 +1205,11 @@ static boolean ConvertMus(byte *musdata, int len, char *filename)
 
 static void *I_SDL_RegisterSong(void *data, int len)
 {
+    char *tofree;
+    char *string;
+    char *token;
+    char *error;
+    char *text;
     char *filename;
     Mix_Music *music;
 
@@ -1219,7 +1225,7 @@ static void *I_SDL_RegisterSong(void *data, int len)
 
     if (filename != NULL)		// FIXME: ON THE WII, M_READFILE SOMETIMES CAUSES THE GAME...
     {					// ...TO CRASH RANDOMLY WHENEVER THE MUSIC IS BEING CHANGED
-#if defined(SVE_USE_RWOPS_MUSIC)
+#if defined(USE_RWOPS_MUSIC)
         int size = M_ReadFile(filename, (byte **)&rw_music_data);
         rw_music_cache = SDL_RWFromMem(rw_music_data, size);
         music = Mix_LoadMUS_RW(rw_music_cache);
@@ -1230,8 +1236,28 @@ static void *I_SDL_RegisterSong(void *data, int len)
         {
             // Fall through and play MIDI normally, but print an error
             // message.
-            C_Printf("FAILED TO LOAD SUBSTITUTE MUSIC FILE: %s: %s\n",
-                    filename, Mix_GetError());
+            error = Mix_GetError();
+            M_ForceUppercase(filename);
+            M_ForceUppercase(error);
+/*
+            C_Printf("FAILED TO LOAD SUBSTITUTE MUSIC FILE: %s:\n %s\n",
+                    filename, error);
+*/
+            // SPLIT UP ERROR MESSAGE FOR BETTER CONSOLE VIEW
+            C_Printf("FAILED TO LOAD SUBSTITUTE MUSIC FILE:\n");
+
+            string = strdup(filename);
+
+            if (string != NULL)
+            {
+                tofree = string;
+
+                while ((token = strsep(&string, ".")) != NULL)
+                    C_Printf("%s\n", token);
+
+                free(tofree);
+            }
+            C_Printf("%s\n", error);
         }
         else
         {
@@ -1239,7 +1265,7 @@ static void *I_SDL_RegisterSong(void *data, int len)
             // to loop the music.
             playing_substitute = true;
 
-#if !defined(SVE_USE_RWOPS_MUSIC)
+#if !defined(USE_RWOPS_MUSIC)
             ReadLoopPoints(filename, &file_metadata);
 #endif
 
@@ -1272,8 +1298,9 @@ static void *I_SDL_RegisterSong(void *data, int len)
     if (music == NULL)
     {
         // Failed to load
-
-        C_Printf("ERROR LOADING MIDI: %s\n", Mix_GetError());
+        text = Mix_GetError();
+        M_ForceUppercase(text);
+        C_Printf("ERROR LOADING MIDI: %s\n", text);
     }
 
     // Remove the temporary MIDI file; however, when using an external
@@ -1348,7 +1375,7 @@ static void RestartCurrentTrack(void)
 // then we need to go back.
 /*static*/ void I_SDL_PollMusic(void)
 {
-#if !defined(SVE_USE_RWOPS_MUSIC)
+#if !defined(USE_RWOPS_MUSIC)
     if (playing_substitute && file_metadata.valid)
     {
         double end = (double) file_metadata.end_time

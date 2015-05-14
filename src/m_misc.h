@@ -55,10 +55,5 @@ int M_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args);
 int M_snprintf(char *buf, size_t buf_len, const char *s, ...);
 char *M_OEMToUTF8(const char *ansi);
 
-//
-// haleyjd 20141024: [SVE] Error-checked strdup
-//
-char *M_Strdup(const char *str);
-
 #endif
 

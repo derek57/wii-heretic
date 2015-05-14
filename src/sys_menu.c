@@ -33,6 +33,7 @@ bool	multiplayer = false;
 bool	multiplayer_flag = false;
 
 // Local prototypes: wiiNinja
+bool M_StringCopy(char *dest, const char *src, size_t dest_size);
 void WaitPrompt (char *prompt);
 void drawMain();
 void D_DoomMain (void);
@@ -544,7 +545,7 @@ void Menu_WadList(void)
 	    if ((cnt - start) >= ENTRIES_PER_PAGE)
 		break;
 
-	    strncpy(str, file->filename, 40); //Only 40 chars to fit the screen
+	    M_StringCopy(str, file->filename, 40); //Only 40 chars to fit the screen
 
 	    str[40]=0;
 

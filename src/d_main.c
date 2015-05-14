@@ -777,7 +777,7 @@ void tprintf(char *msg, int initflag)
         if ((tmsg[i] == '\n') || (!tmsg[i]))
         {
             memset(temp, 0, 80);
-            strncpy(temp, tmsg + start, i - start);
+            M_StringCopy(temp, tmsg + start, i - start);
             _settextposition(MSG_Y + add, 40 - strlen(temp) / 2);
             _outtext(temp);
             start = i + 1;

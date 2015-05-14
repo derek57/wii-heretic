@@ -1477,13 +1477,13 @@ void G_Ticker(void)
 /*
                             if (netgame)
                             {
-                                strncpy(savedescription, DEH_String("NET GAME"),
+                                M_StringCopy(savedescription, DEH_String("NET GAME"),
                                         sizeof(savedescription));
                             }
                             else
 */
                             {
-                                strncpy(savedescription, DEH_String("SAVE GAME"),
+                                M_StringCopy(savedescription, DEH_String("SAVE GAME"),
                                         sizeof(savedescription));
                             }
 
@@ -1915,7 +1915,7 @@ static char *savename = NULL;
 
 void G_LoadGame(char *name)
 {
-    savename = strdup(name);
+    savename = M_StringDuplicate(name);
     gameaction = ga_loadgame;
 }
 
