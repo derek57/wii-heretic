@@ -342,7 +342,7 @@ void ChangeWeaponRight(void)
 
     weapontype_t	num;
 
-    if (gamestate == GS_LEVEL && !(MenuActive || automapactive))
+    if (gamestate == GS_LEVEL && !(MenuActive /*|| automapactive*/))
     {
 	plyrweap = &players[consoleplayer];
 
@@ -380,7 +380,7 @@ void ChangeWeaponLeft(void)
 
     weapontype_t	num;
 
-    if (gamestate == GS_LEVEL && !(MenuActive || automapactive))
+    if (gamestate == GS_LEVEL && !(MenuActive /*|| automapactive*/))
     {
 	plyrweap = &players[consoleplayer];
 
