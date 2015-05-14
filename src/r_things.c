@@ -53,8 +53,12 @@ fixed_t pspritescale, pspriteiscale;
 lighttable_t **spritelights;
 
 // constant arrays used for psprite clipping and initializing clipping
-short negonearray[SCREENWIDTH];
-short screenheightarray[SCREENWIDTH];
+/*
+short		negonearray[SCREENWIDTH];			// CHANGED FOR HIRES
+short		screenheightarray[SCREENWIDTH];			// CHANGED FOR HIRES
+*/
+int		negonearray[SCREENWIDTH];			// CHANGED FOR HIRES
+int		screenheightarray[SCREENWIDTH];			// CHANGED FOR HIRES
 
 /*
 ===============================================================================
@@ -319,8 +323,12 @@ vissprite_t *R_NewVisSprite(void)
 ================
 */
 
-short *mfloorclip;
-short *mceilingclip;
+/*
+short*		mfloorclip;			// CHANGED FOR HIRES
+short*		mceilingclip;			// CHANGED FOR HIRES
+*/
+int*		mfloorclip;			// CHANGED FOR HIRES
+int*		mceilingclip;			// CHANGED FOR HIRES
 fixed_t spryscale;
 fixed_t sprtopscreen;
 fixed_t sprbotscreen;
@@ -408,7 +416,8 @@ void R_DrawVisSprite(vissprite_t * vis, int x1, int x2)
             ((vis->mobjflags & MF_TRANSLATION) >> (MF_TRANSSHIFT - 8));
     }
 
-    dc_iscale = abs(vis->xiscale) >> detailshift;
+//    dc_iscale = abs(vis->xiscale)>>detailshift;			// CHANGED FOR HIRES
+    dc_iscale = abs(vis->xiscale)>>(detailshift && !hires);		// CHANGED FOR HIRES
     dc_texturemid = vis->texturemid;
     frac = vis->startfrac;
     spryscale = vis->scale;
@@ -556,7 +565,8 @@ void R_ProjectSprite(mobj_t * thing)
     vis = R_NewVisSprite();
     vis->mobjflags = thing->flags;
     vis->psprite = false;
-    vis->scale = xscale << detailshift;
+//    vis->scale = xscale<<detailshift;				// CHANGED FOR HIRES
+    vis->scale = xscale<<(detailshift && !hires);		// CHANGED FOR HIRES
     vis->gx = thing->x;
     vis->gy = thing->y;
     vis->gz = thing->z;
@@ -739,7 +749,8 @@ void R_DrawPSprite(pspdef_t * psp)
     }
     vis->x1 = x1 < 0 ? 0 : x1;
     vis->x2 = x2 >= viewwidth ? viewwidth - 1 : x2;
-    vis->scale = pspritescale << detailshift;
+//    vis->scale = pspritescale<<detailshift;			// CHANGED FOR HIRES
+    vis->scale = pspritescale<<(detailshift && !hires);		// CHANGED FOR HIRES
     if (flip)
     {
         vis->xiscale = -pspriteiscale;
@@ -891,7 +902,12 @@ void R_SortVisSprites(void)
 void R_DrawSprite(vissprite_t * spr)
 {
     drawseg_t *ds;
-    short clipbot[SCREENWIDTH], cliptop[SCREENWIDTH];
+/*
+    short		clipbot[SCREENWIDTH];			// CHANGED FOR HIRES
+    short		cliptop[SCREENWIDTH];			// CHANGED FOR HIRES
+*/
+    int			clipbot[SCREENWIDTH];			// CHANGED FOR HIRES
+    int			cliptop[SCREENWIDTH];			// CHANGED FOR HIRES
     int x, r1, r2;
     fixed_t scale, lowscale;
     int silhouette;

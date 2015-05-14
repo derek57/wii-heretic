@@ -43,18 +43,31 @@ fixed_t skyiscale;
 // opening
 //
 
-visplane_t visplanes[MAXVISPLANES], *lastvisplane;
+//visplane_t		visplanes[MAXVISPLANES];		// CHANGED FOR HIRES
+visplane_t*		visplanes = NULL;			// CHANGED FOR HIRES
+visplane_t *lastvisplane;
 visplane_t *floorplane, *ceilingplane;
 
-short openings[MAXOPENINGS], *lastopening;
+static int		numvisplanes;				// ADDED FOR HIRES
+
+/*
+short			openings[MAXOPENINGS];			// CHANGED FOR HIRES
+short*			lastopening;				// CHANGED FOR HIRES
+*/
+int			openings[MAXOPENINGS];			// CHANGED FOR HIRES
+int*			lastopening;				// CHANGED FOR HIRES
 
 //
 // clip values are the solid pixel bounding the range
 // floorclip starts out SCREENHEIGHT
 // ceilingclip starts out -1
 //
-short floorclip[SCREENWIDTH];
-short ceilingclip[SCREENWIDTH];
+/*
+short			floorclip[SCREENWIDTH];			// CHANGED FOR HIRES
+short			ceilingclip[SCREENWIDTH];		// CHANGED FOR HIRES
+*/
+int			floorclip[SCREENWIDTH];			// CHANGED FOR HIRES
+int			ceilingclip[SCREENWIDTH];		// CHANGED FOR HIRES
 
 //
 // spanstart holds the start of a plane span
@@ -218,6 +231,29 @@ void R_ClearPlanes(void)
 }
 
 
+static void R_RaiseVisplanes (visplane_t** vp)
+{
+    if (lastvisplane - visplanes == numvisplanes)
+    {
+	int numvisplanes_old = numvisplanes;
+	visplane_t* visplanes_old = visplanes;
+
+	numvisplanes = numvisplanes ? 2 * numvisplanes : MAXVISPLANES;
+	visplanes = realloc(visplanes, numvisplanes * sizeof(*visplanes));
+	memset(visplanes + numvisplanes_old, 0, (numvisplanes - numvisplanes_old) * sizeof(*visplanes));
+
+	lastvisplane = visplanes + numvisplanes_old;
+	floorplane = visplanes + (floorplane - visplanes_old);
+	ceilingplane = visplanes + (ceilingplane - visplanes_old);
+
+	if (numvisplanes_old)
+	    printf("R_FindPlane: Hit MAXVISPLANES limit at %d, raised to %d.\n", numvisplanes_old, numvisplanes);
+
+	// keep the pointer passed as argument in relation to the visplanes pointer
+	if (vp)
+	    *vp = visplanes + (*vp - visplanes_old);
+    }
+}
 
 /*
 ===============
@@ -252,10 +288,11 @@ visplane_t *R_FindPlane(fixed_t height, int picnum,
         return (check);
     }
 
-    if (lastvisplane - visplanes == MAXVISPLANES)
-    {
-        I_Error("R_FindPlane: no more visplanes");
-    }
+/*		
+    if (lastvisplane - visplanes == MAXVISPLANES)		// CHANGED FOR HIRES
+	I_Error ("R_FindPlane: no more visplanes");		// CHANGED FOR HIRES
+*/		
+    R_RaiseVisplanes(&check);
 
     lastvisplane++;
     check->height = height;
@@ -305,8 +342,8 @@ visplane_t *R_CheckPlane(visplane_t * pl, int start, int stop)
     }
 
     for (x = intrl; x <= intrh; x++)
-//        if (pl->top[x] != 0xff)				// CHANGED FOR HIRES
-        if (pl->top[x] != 0xffff)				// CHANGED FOR HIRES
+//	if (pl->top[x] != 0xff)					// CHANGED FOR HIRES
+	if (pl->top[x] != 0xffffffffu)				// CHANGED FOR HIRES
             break;
 
     if (x > intrh)
@@ -317,6 +354,8 @@ visplane_t *R_CheckPlane(visplane_t * pl, int start, int stop)
     }
 
 // make a new visplane
+
+    R_RaiseVisplanes(&pl);					// ADDED FOR HIRES
 
     lastvisplane->height = pl->height;
     lastvisplane->picnum = pl->picnum;
@@ -342,7 +381,19 @@ visplane_t *R_CheckPlane(visplane_t * pl, int start, int stop)
 ================
 */
 
-void R_MakeSpans(int x, int t1, int b1, int t2, int b2)
+void
+R_MakeSpans
+( int		x,
+/*
+  int	t1,							// CHANGED FOR HIRES
+  int	b1,							// CHANGED FOR HIRES
+  int	t2,							// CHANGED FOR HIRES
+  int	b2 )							// CHANGED FOR HIRES
+*/
+  unsigned int	t1,						// CHANGED FOR HIRES
+  unsigned int	b1,						// CHANGED FOR HIRES
+  unsigned int	t2,						// CHANGED FOR HIRES
+  unsigned int	b2 )						// CHANGED FOR HIRES
 {
     while (t1 < t2 && t1 <= b1)
     {
@@ -395,11 +446,22 @@ void R_DrawPlanes(void)
     extern int columnofs[MAXWIDTH];
 
 #ifdef RANGECHECK
-    if (ds_p - drawsegs > MAXDRAWSEGS)
-        I_Error("R_DrawPlanes: drawsegs overflow (%i)", ds_p - drawsegs);
-    if (lastvisplane - visplanes > MAXVISPLANES)
-        I_Error("R_DrawPlanes: visplane overflow (%i)",
-                lastvisplane - visplanes);
+/*
+    if (ds_p - drawsegs > MAXDRAWSEGS)				// CHANGED FOR HIRES
+	I_Error ("R_DrawPlanes: drawsegs overflow (%i)",	// CHANGED FOR HIRES
+		 ds_p - drawsegs);				// CHANGED FOR HIRES
+    
+    if (lastvisplane - visplanes > MAXVISPLANES)		// CHANGED FOR HIRES
+	I_Error ("R_DrawPlanes: visplane overflow (%i)",	// CHANGED FOR HIRES
+		 lastvisplane - visplanes);			// CHANGED FOR HIRES
+*/    
+    if (ds_p - drawsegs > numdrawsegs)				// CHANGED FOR HIRES
+	I_Error ("R_DrawPlanes: drawsegs overflow (%i)",	// CHANGED FOR HIRES
+		 ds_p - drawsegs);				// CHANGED FOR HIRES
+    
+    if (lastvisplane - visplanes > numvisplanes)		// CHANGED FOR HIRES
+	I_Error ("R_DrawPlanes: visplane overflow (%i)",	// CHANGED FOR HIRES
+		 lastvisplane - visplanes);			// CHANGED FOR HIRES
     if (lastopening - openings > MAXOPENINGS)
         I_Error("R_DrawPlanes: opening overflow (%i)",
                 lastopening - openings);
@@ -414,14 +476,16 @@ void R_DrawPlanes(void)
         //
         if (pl->picnum == skyflatnum)
         {
-            dc_iscale = skyiscale;
+//	    dc_iscale = pspriteiscale>>detailshift;			// CHANGED FOR HIRES
+	    dc_iscale = pspriteiscale>>(detailshift && !hires);		// CHANGED FOR HIRES
             dc_colormap = colormaps;    // sky is allways drawn full bright
             dc_texturemid = skytexturemid;
             for (x = pl->minx; x <= pl->maxx; x++)
             {
                 dc_yl = pl->top[x];
                 dc_yh = pl->bottom[x];
-                if (dc_yl <= dc_yh)
+//		if (dc_yl <= dc_yh)					// CHANGED FOR HIRES
+		if ((unsigned) dc_yl <= dc_yh)				// CHANGED FOR HIRES
                 {
                     angle = (viewangle + xtoviewangle[x]) >> ANGLETOSKYSHIFT;
                     dc_x = x;
@@ -514,11 +578,11 @@ void R_DrawPlanes(void)
             light = 0;
         planezlight = zlight[light];
 /*
-        pl->top[pl->maxx + 1] = 0xff;				// CHANGED FOR HIRES
-        pl->top[pl->minx - 1] = 0xff;				// CHANGED FOR HIRES
+	pl->top[pl->maxx+1] = 0xff;				// CHANGED FOR HIRES
+	pl->top[pl->minx-1] = 0xff;				// CHANGED FOR HIRES
 */
-        pl->top[pl->maxx + 1] = 0xffff;				// CHANGED FOR HIRES
-        pl->top[pl->minx - 1] = 0xffff;				// CHANGED FOR HIRES
+	pl->top[pl->maxx+1] = 0xffffffffu;			// CHANGED FOR HIRES
+	pl->top[pl->minx-1] = 0xffffffffu;			// CHANGED FOR HIRES
 
         stop = pl->maxx + 1;
         for (x = pl->minx; x <= stop; x++)

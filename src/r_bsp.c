@@ -32,7 +32,11 @@ side_t *sidedef;
 line_t *linedef;
 sector_t *frontsector, *backsector;
 
-drawseg_t drawsegs[MAXDRAWSEGS], *ds_p;
+//drawseg_t	drawsegs[MAXDRAWSEGS];		// CHANGED FOR HIRES
+drawseg_t*	drawsegs = NULL;		// CHANGED FOR HIRES
+drawseg_t*	ds_p;
+
+int		numdrawsegs = 0;		// ADDED FOR HIRES
 
 void R_StoreWallRange(int start, int stop);
 
@@ -66,7 +70,8 @@ typedef struct
     int first, last;
 } cliprange_t;
 
-#define	MAXSEGS	32
+//#define	MAXSEGS	32			// CHANGED FOR HIRES
+#define MAXSEGS		(SCREENWIDTH/2+1)	// CHANGED FOR HIRES
 
 cliprange_t solidsegs[MAXSEGS], *newend;        // newend is one past the last valid seg
 

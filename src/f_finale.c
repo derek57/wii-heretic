@@ -230,7 +230,7 @@ void F_TextWrite(void)
 
         w = W_CacheLumpNum(FontABaseLump + c - 33, PU_CACHE);
 //        if (cx + w->width > SCREENWIDTH)		// NO DEFINITELY NOT ON THE WII
-        if (cx + SHORT(w->width) > SCREENWIDTH)		// FIX FOR THE WII
+        if (cx + SHORT(w->width) > ORIGWIDTH)		// FIX FOR THE WII
             break;
         V_DrawPatch(cx, cy, w);
 //        cx += w->width;				// NO DEFINITELY NOT ON THE WII
@@ -244,7 +244,8 @@ void F_DrawPatchCol(int x, patch_t * patch, int col)
 {
     column_t *column;
     byte *source, *dest, *desttop;
-    int count;
+//    int		count;								// CHANGED FOR HIRES
+    int		count, f;								// CHANGED FOR HIRES
 
     column = (column_t *) ((byte *) patch + LONG(patch->columnofs[col]));
     desttop = I_VideoBuffer + x;
@@ -253,15 +254,24 @@ void F_DrawPatchCol(int x, patch_t * patch, int col)
 
     while (column->topdelta != 0xff)
     {
-        source = (byte *) column + 3;
-        dest = desttop + column->topdelta * SCREENWIDTH;
-        count = column->length;
-
-        while (count--)
-        {
-            *dest = *source++;
-            dest += SCREENWIDTH;
-        }
+	for (f = 0; f <= hires; f++)							// ADDED FOR HIRES
+	{										// ADDED FOR HIRES
+	    source = (byte *)column + 3;
+//	    dest = desttop + column->topdelta*SCREENWIDTH;				// CHANGED FOR HIRES
+	    dest = desttop + column->topdelta*(SCREENWIDTH << hires) + (x * hires) + f;	// CHANGED FOR HIRES
+	    count = column->length;
+		
+	    while (count--)
+	    {
+		if (hires)								// ADDED FOR HIRES
+		{									// ADDED FOR HIRES
+		    *dest = *source;							// ADDED FOR HIRES
+		    dest += SCREENWIDTH;						// ADDED FOR HIRES
+		}									// ADDED FOR HIRES
+		*dest = *source++;
+		dest += SCREENWIDTH;
+	    }
+	}										// ADDED FOR HIRES
         column = (column_t *) ((byte *) column + column->length + 4);
     }
 }

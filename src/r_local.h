@@ -168,20 +168,26 @@ typedef struct
     int lightlevel;
     int special;
     int minx, maxx;
-/*										// CHANGED FOR HIRES
-    byte pad1;                  // leave pads for [minx-1]/[maxx+1]		// CHANGED FOR HIRES
-    byte top[SCREENWIDTH];							// CHANGED FOR HIRES
-    byte pad2;									// CHANGED FOR HIRES
-    byte pad3;									// CHANGED FOR HIRES
-    byte bottom[SCREENWIDTH];							// CHANGED FOR HIRES
-    byte pad4;									// CHANGED FOR HIRES
+/*  
+    byte		pad1;						// CHANGED FOR HIRES
+    // Here lies the rub for all
+    //  dynamic resize/change of resolution.
+    byte		top[SCREENWIDTH];				// CHANGED FOR HIRES
+    byte		pad2;						// CHANGED FOR HIRES
+    byte		pad3;						// CHANGED FOR HIRES
+    // See above.
+    byte		bottom[SCREENWIDTH];				// CHANGED FOR HIRES
+    byte		pad4;						// CHANGED FOR HIRES
 */
-    unsigned short pad1;                  // leave pads for [minx-1]/[maxx+1]	// CHANGED FOR HIRES
-    unsigned short top[SCREENWIDTH];						// CHANGED FOR HIRES
-    unsigned short pad2;							// CHANGED FOR HIRES
-    unsigned short pad3;							// CHANGED FOR HIRES
-    unsigned short bottom[SCREENWIDTH];						// CHANGED FOR HIRES
-    unsigned short pad4;							// CHANGED FOR HIRES
+    unsigned int		pad1;					// CHANGED FOR HIRES
+    // Here lies the rub for all
+    //  dynamic resize/change of resolution.		
+    unsigned int		top[SCREENWIDTH];			// CHANGED FOR HIRES
+    unsigned int		pad2;					// CHANGED FOR HIRES
+    unsigned int		pad3;					// CHANGED FOR HIRES
+    // See above.
+    unsigned int		bottom[SCREENWIDTH];			// CHANGED FOR HIRES
+    unsigned int		pad4;					// CHANGED FOR HIRES
 } visplane_t;
 
 typedef struct drawseg_s
@@ -193,9 +199,14 @@ typedef struct drawseg_s
     fixed_t bsilheight;         // don't clip sprites above this
     fixed_t tsilheight;         // don't clip sprites below this
 // pointers to lists for sprite clipping
-    short *sprtopclip;          // adjusted so [x1] is first value
-    short *sprbottomclip;       // adjusted so [x1] is first value
-    short *maskedtexturecol;    // adjusted so [x1] is first value
+/*
+    short*		sprtopclip;	     // adjusted so [x1] is first value
+    short*		sprbottomclip;	     // adjusted so [x1] is first value
+    short*		maskedtexturecol;    // adjusted so [x1] is first value
+*/    
+    int*		sprtopclip;          // CHANGED FOR HIRES
+    int*		sprbottomclip;	     // CHANGED FOR HIRES
+    int*		maskedtexturecol;    // CHANGED FOR HIRES
 } drawseg_t;
 
 #define	SIL_NONE	0
@@ -345,7 +356,10 @@ extern boolean markfloor;       // false if the back side is the same plane
 extern boolean markceiling;
 extern boolean skymap;
 
-extern drawseg_t drawsegs[MAXDRAWSEGS], *ds_p;
+extern drawseg_t*	ds_p;
+extern drawseg_t*	drawsegs;			// CHANGED FOR HIRES
+//extern drawseg_t	drawsegs[MAXDRAWSEGS];		// CHANGED FOR HIRES
+extern int		numdrawsegs;			// ADDED FOR HIRES
 
 extern lighttable_t **hscalelight, **vscalelight, **dscalelight;
 
@@ -371,11 +385,19 @@ typedef void (*planefunction_t) (int top, int bottom);
 extern planefunction_t floorfunc, ceilingfunc;
 
 extern int skyflatnum;
+/*
+extern short			openings[MAXOPENINGS];			// CHANGED FOR HIRES
+extern short*			lastopening;				// CHANGED FOR HIRES
+*/
+extern int			openings[MAXOPENINGS];			// CHANGED FOR HIRES
+extern int*			lastopening;				// CHANGED FOR HIRES
 
-extern short openings[MAXOPENINGS], *lastopening;
-
-extern short floorclip[SCREENWIDTH];
-extern short ceilingclip[SCREENWIDTH];
+/*
+extern short			floorclip[SCREENWIDTH];			// CHANGED FOR HIRES
+extern short			ceilingclip[SCREENWIDTH];		// CHANGED FOR HIRES
+*/
+extern int			floorclip[SCREENWIDTH];			// CHANGED FOR HIRES
+extern int			ceilingclip[SCREENWIDTH];		// CHANGED FOR HIRES
 
 extern fixed_t yslope[SCREENHEIGHT];
 extern fixed_t distscale[SCREENWIDTH];
@@ -383,7 +405,19 @@ extern fixed_t distscale[SCREENWIDTH];
 void R_InitPlanes(void);
 void R_ClearPlanes(void);
 void R_MapPlane(int y, int x1, int x2);
-void R_MakeSpans(int x, int t1, int b1, int t2, int b2);
+void
+R_MakeSpans
+( int		x,
+/*
+  int	t1,							// CHANGED FOR HIRES
+  int	b1,							// CHANGED FOR HIRES
+  int	t2,							// CHANGED FOR HIRES
+  int	b2 )							// CHANGED FOR HIRES
+*/
+  unsigned int	t1,						// CHANGED FOR HIRES
+  unsigned int	b1,						// CHANGED FOR HIRES
+  unsigned int	t2,						// CHANGED FOR HIRES
+  unsigned int	b2 );						// CHANGED FOR HIRES
 void R_DrawPlanes(void);
 
 visplane_t *R_FindPlane(fixed_t height, int picnum, int lightlevel,
@@ -420,18 +454,28 @@ void R_PrecacheLevel(void);
 //
 // R_things.c
 //
-#define	MAXVISSPRITES	128
+//#define MAXVISSPRITES  	128				// CHANGED FOR HIRES
+#define MAXVISSPRITES  	128*8					// CHANGED FOR HIRES
 
 extern vissprite_t vissprites[MAXVISSPRITES], *vissprite_p;
 extern vissprite_t vsprsortedhead;
 
 // constant arrays used for psprite clipping and initializing clipping
-extern short negonearray[SCREENWIDTH];
-extern short screenheightarray[SCREENWIDTH];
+/*
+extern short		negonearray[SCREENWIDTH];			// CHANGED FOR HIRES
+extern short		screenheightarray[SCREENWIDTH];			// CHANGED FOR HIRES
+*/
+extern int		negonearray[SCREENWIDTH];			// CHANGED FOR HIRES
+extern int		screenheightarray[SCREENWIDTH];			// CHANGED FOR HIRES
 
 // vars for R_DrawMaskedColumn
-extern short *mfloorclip;
-extern short *mceilingclip;
+/*
+extern short*		mfloorclip;			// CHANGED FOR HIRES
+extern short*		mceilingclip;			// CHANGED FOR HIRES
+*/
+extern int*		mfloorclip;			// CHANGED FOR HIRES
+extern int*		mceilingclip;			// CHANGED FOR HIRES
+
 extern fixed_t spryscale;
 extern fixed_t sprtopscreen;
 extern fixed_t sprbotscreen;

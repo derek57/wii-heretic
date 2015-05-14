@@ -38,6 +38,7 @@ files only know about ccordinates, not the architecture of the frame buffer.
 
 byte *viewimage;
 int viewwidth, scaledviewwidth, viewheight, viewwindowx, viewwindowy;
+int		scaledviewheight;			// ADDED FOR HIRES
 byte *ylookup[MAXHEIGHT];
 int columnofs[MAXWIDTH];
 byte translations[3][256];      // color tables for different players
@@ -95,6 +96,9 @@ void R_DrawColumnLow(void)
 {
     int count;
     byte *dest;
+    byte*		dest2;							// ???
+    byte*		dest3; 							// ADDED FOR HIRES
+    byte*		dest4;							// ADDED FOR HIRES
     fixed_t frac, fracstep;
 
     count = dc_yh - dc_yl;
@@ -107,15 +111,32 @@ void R_DrawColumnLow(void)
 //      dccount++;
 #endif
 
-    dest = ylookup[dc_yl] + columnofs[dc_x];
+//    dest = ylookup[dc_yl] + columnofs[dc_x];
+
+    dest = ylookup[(dc_yl << hires)] + columnofs[dc_x];				// CHANGED FOR HIRES
+    dest2 = ylookup[(dc_yl << hires)] + columnofs[dc_x+1];			// CHANGED FOR HIRES
+    dest3 = ylookup[(dc_yl << hires) + 1] + columnofs[dc_x];			// ADDED FOR HIRES
+    dest4 = ylookup[(dc_yl << hires) + 1] + columnofs[dc_x+1];			// ADDED FOR HIRES
 
     fracstep = dc_iscale;
     frac = dc_texturemid + (dc_yl - centery) * fracstep;
 
     do
     {
+	// ???
+	*dest2 = *dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
+/*
         *dest = dc_colormap[dc_source[(frac >> FRACBITS) & 127]];
         dest += SCREENWIDTH;
+*/
+	dest += SCREENWIDTH << hires;						// CHANGED FOR HIRES
+	dest2 += SCREENWIDTH << hires;						// CHANGED FOR HIRES
+	if (hires)								// ADDED FOR HIRES
+	{									// ADDED FOR HIRES
+	    *dest4 = *dest3 = dc_colormap[dc_source[(frac>>FRACBITS)&127]];	// ADDED FOR HIRES
+	    dest3 += SCREENWIDTH << hires;					// ADDED FOR HIRES
+	    dest4 += SCREENWIDTH << hires;					// ADDED FOR HIRES
+	}									// ADDED FOR HIRES
         frac += fracstep;
     }
     while (count--);
@@ -315,7 +336,8 @@ void R_DrawSpan(void)
 void R_DrawSpanLow(void)
 {
     fixed_t xfrac, yfrac;
-    byte *dest;
+//    byte *dest;								// CHANGED FOR HIRES
+    byte *dest, *dest2;								// CHANGED FOR HIRES
     int count, spot;
 
 #ifdef RANGECHECK
@@ -328,12 +350,19 @@ void R_DrawSpanLow(void)
     xfrac = ds_xfrac;
     yfrac = ds_yfrac;
 
-    dest = ylookup[ds_y] + columnofs[ds_x1];
+//    dest = ylookup[ds_y] + columnofs[ds_x1];					// CHANGED FOR HIRES
+    dest = ylookup[(ds_y << hires)] + columnofs[ds_x1];				// CHANGED FOR HIRES
+    dest2 = ylookup[(ds_y << hires) + 1] + columnofs[ds_x1];			// ADDED FOR HIRES
     count = ds_x2 - ds_x1;
     do
     {
         spot = ((yfrac >> (16 - 6)) & (63 * 64)) + ((xfrac >> 16) & 63);
         *dest++ = ds_colormap[ds_source[spot]];
+	if (hires)								// ADDED FOR HIRES
+	{									// ADDED FOR HIRES
+	    *dest2++ = ds_colormap[ds_source[spot]];				// ADDED FOR HIRES
+	    *dest2++ = ds_colormap[ds_source[spot]];				// ADDED FOR HIRES
+	}									// ADDED FOR HIRES
         xfrac += ds_xstep;
         yfrac += ds_ystep;
     }

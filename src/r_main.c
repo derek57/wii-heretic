@@ -85,6 +85,8 @@ void (*spanfunc) (void);
 extern boolean MenuActive;
 extern boolean automapactive;
 
+extern int		scaledviewheight;			// ADDED FOR HIRES
+
 /*
 ===================
 =
@@ -355,7 +357,8 @@ fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
 // bothe sines are allways positive
     sinea = finesine[anglea >> ANGLETOFINESHIFT];
     sineb = finesine[angleb >> ANGLETOFINESHIFT];
-    num = FixedMul(projection, sineb) << detailshift;
+//    num = FixedMul(projection,sineb)<<detailshift;			// CHANGED FOR HIRES
+    num = FixedMul(projection,sineb)<<(detailshift && !hires);		// CHANGED FOR HIRES
     den = FixedMul(rw_distance, sinea);
     if (den > num >> 16)
     {
@@ -572,7 +575,8 @@ void R_ExecuteSetViewSize(void)
     if (setblocks == 11)
     {
         scaledviewwidth = SCREENWIDTH;
-        viewheight = SCREENHEIGHT;
+//	viewheight = SCREENHEIGHT;					// CHANGED FOR HIRES
+	scaledviewheight = SCREENHEIGHT;				// CHANGED FOR HIRES
     }
     else
     {
@@ -581,11 +585,12 @@ void R_ExecuteSetViewSize(void)
         viewheight = (setblocks * 158 / 10);			// CHANGED FOR HIRES
 */
         scaledviewwidth = (setblocks * 32) << hires;		// CHANGED FOR HIRES
-        viewheight = ((setblocks * 158 / 10)) << hires;		// CHANGED FOR HIRES
+	scaledviewheight = ((setblocks*158/10))<<hires;		// CHANGED FOR HIRES
     }
 
     detailshift = setdetail;
     viewwidth = scaledviewwidth >> detailshift;
+    viewheight = scaledviewheight>>(detailshift && hires);		// ADDED FOR HIRES
 
     centery = viewheight / 2;
     centerx = viewwidth / 2;
@@ -608,7 +613,8 @@ void R_ExecuteSetViewSize(void)
         spanfunc = R_DrawSpanLow;
     }
 
-    R_InitBuffer(scaledviewwidth, viewheight);
+//    R_InitBuffer (scaledviewwidth, viewheight);					// CHANGED FOR HIRES
+    R_InitBuffer (scaledviewwidth, scaledviewheight);					// CHANGED FOR HIRES
 
     R_InitTextureMapping();
 
@@ -634,7 +640,8 @@ void R_ExecuteSetViewSize(void)
     {
         dy = ((i - viewheight / 2) << FRACBITS) + FRACUNIT / 2;
         dy = abs(dy);
-        yslope[i] = FixedDiv((viewwidth << detailshift) / 2 * FRACUNIT, dy);
+//	yslope[i] = FixedDiv ( (viewwidth<<detailshift)/2*FRACUNIT, dy);		// CHANGED FOR HIRES
+	yslope[i] = FixedDiv ( (viewwidth<<(detailshift && !hires))/2*FRACUNIT, dy);	// CHANGED FOR HIRES
     }
 
     for (i = 0; i < viewwidth; i++)
@@ -782,7 +789,7 @@ void R_SetupFrame(player_t * player)
         centeryfrac = centery << FRACBITS;
         for (i = 0; i < viewheight; i++)
         {
-            yslope[i] = FixedDiv((viewwidth << detailshift) / 2 * FRACUNIT,
+            yslope[i] = FixedDiv((viewwidth << (detailshift && !hires)) / 2 * FRACUNIT,
                                  abs(((i - centery) << FRACBITS) +
                                      FRACUNIT / 2));
         }
