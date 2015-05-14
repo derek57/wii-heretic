@@ -47,8 +47,33 @@ int use_vanilla_weapon_change = 1;
 
 extern boolean d_recoil;
 extern boolean autoaim;
+extern boolean d_thrust;
 
 static int MaceSpotCount;
+
+static const int recoil_values[][2] = {
+    {10,   0}, // wp_staff
+    {10,   4}, // wp_goldwand
+    {30,  12}, // wp_crossbow
+    {10,   4}, // wp_blaster
+    {100, 16}, // wp_phoenixrod
+    {20,   8}, // wp_skullrod
+    {100, 16}, // wp_mace
+    {0,   -2}, // wp_gauntlets
+    {80,  16}, // wp_beak
+};
+
+void A_Recoil (player_t* player)
+{
+    extern void P_Thrust (player_t* player, angle_t angle, fixed_t move);
+
+    if (/*!netgame &&*/ d_recoil && !(player->mo->flags & MF_NOCLIP))
+	P_Thrust(player, ANG180 + player->mo->angle, 2048 * recoil_values[player->readyweapon][0]);
+/*
+    if (crispy_pitch)
+	player->recoilpitch = recoil_values[player->readyweapon][1]<<FRACBITS;
+*/
+}
 
 static struct
 {
@@ -997,6 +1022,9 @@ void A_FireBlasterPL1(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (14*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1020,6 +1048,9 @@ void A_FireBlasterPL2(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (14*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1049,6 +1080,9 @@ void A_FireGoldWandPL1(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (6*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1084,6 +1118,9 @@ void A_FireGoldWandPL2(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (6*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1160,6 +1197,9 @@ void A_FireMacePL1(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (10*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1298,6 +1338,9 @@ void A_FireMacePL2(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (10*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1413,6 +1456,9 @@ void A_FireCrossbowPL1(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (8*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1436,6 +1482,9 @@ void A_FireCrossbowPL2(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (8*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1480,6 +1529,9 @@ void A_FireSkullRodPL1(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (12*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1518,6 +1570,9 @@ void A_FireSkullRodPL2(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (12*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1687,6 +1742,9 @@ void A_FirePhoenixPL1(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (10*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
@@ -1785,6 +1843,9 @@ void A_FirePhoenixPL2(player_t * player, pspdef_t * psp)
 
     if(d_recoil)
         player->recoilpitch = (10*FRACUNIT);
+
+    if(d_thrust)
+        A_Recoil(player);
 }
 
 //----------------------------------------------------------------------------
