@@ -2961,7 +2961,7 @@ boolean MN_Responder(event_t * event)
 		{
 		    if (FirstKey == 0)
 		    {
-			CurrentItPos = 25; // End of Key menu (14 == 15 (max lines on a page) - 1)
+			CurrentItPos = 19; // End of Key menu (14 == 15 (max lines on a page) - 1)
 			FirstKey = FIRSTKEY_MAX;
 		    }
 		    else
