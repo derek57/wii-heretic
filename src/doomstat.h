@@ -289,5 +289,6 @@ extern  ticcmd_t       *netcmds;
 extern  boolean		d_recoil;
 extern  boolean		start_respawnparm;
 extern  boolean		start_fastparm;
+extern  boolean		autoaim;
 
 #endif

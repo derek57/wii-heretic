@@ -47,6 +47,7 @@ extern boolean am_rotate;
 extern boolean d_recoil;
 extern boolean respawnparm;
 extern boolean fastparm;
+extern boolean autoaim;
 
 //int mspeed;
 extern int mouseSensitivity;
@@ -362,6 +363,7 @@ void M_BindBaseControls(void)
     M_BindVariable("recoil",                 &d_recoil);
     M_BindVariable("monsters_respawn",       &respawnparm);
     M_BindVariable("monsters_fast",          &fastparm);
+    M_BindVariable("auto_aim",               &autoaim);
     M_BindVariable("key_fire",               &joy_r);
     M_BindVariable("key_use",                &joy_l);
     M_BindVariable("key_menu",               &joy_minus);

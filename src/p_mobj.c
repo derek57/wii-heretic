@@ -40,6 +40,8 @@ void P_SpawnMapThing(mapthing_t * mthing);
 mobjtype_t PuffType;
 mobj_t *MissileMobj;
 
+extern boolean autoaim;
+
 static fixed_t FloatBobOffsets[64] = {
     0, 51389, 102283, 152192,
     200636, 247147, 291278, 332604,
@@ -1525,25 +1527,49 @@ mobj_t *P_SpawnMissileAngle(mobj_t * source, mobjtype_t type,
 mobj_t *P_SpawnPlayerMissile(mobj_t * source, mobjtype_t type)
 {
     angle_t an;
-    fixed_t x, y, z, slope;
+    fixed_t x, y, z, aim, slope = NULL;
 
     // Try to find a target
     an = source->angle;
-    slope = P_AimLineAttack(source, an, 16 * 64 * FRACUNIT);
-    if (!linetarget)
+    if(/*netgame ||*/ autoaim) // single player autoaim toggle
     {
-        an += 1 << 26;
-        slope = P_AimLineAttack(source, an, 16 * 64 * FRACUNIT);
-        if (!linetarget)
+        slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
+
+        if(!linetarget)
         {
-            an -= 2 << 26;
-            slope = P_AimLineAttack(source, an, 16 * 64 * FRACUNIT);
+            an += 1<<26;
+            slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
+
+            if(!linetarget)
+            {
+                an -= 2<<26;
+                slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
+            }
+
+            if(!linetarget)
+            {
+                an = source->angle;
+/*
+		if (!autoaim)
+		    slope = ((p2fromp(source->player)->pitch / MLOOKUNIT) << FRACBITS) / 173;
+*/
+                // Removed, for look up/down support.
+                //slope = 0; 
+            }
         }
-        if (!linetarget)
-        {
-            an = source->angle;
-            slope = ((source->player->lookdir) << FRACBITS) / 173;
-        }
+
+        if(linetarget)
+//            P_SetTarget(&source->target, linetarget);
+            source->target = linetarget;
+    }
+    else
+    {
+        P_AimLineAttack(source, an, 16*64*FRACUNIT);
+        if(linetarget)
+//            P_SetTarget(&source->target, linetarget);
+            source->target = linetarget;
+
+        linetarget = NULL;
     }
     x = source->x;
     y = source->y;
@@ -1558,12 +1584,35 @@ mobj_t *P_SpawnPlayerMissile(mobj_t * source, mobjtype_t type)
     {
         S_StartSound(MissileMobj, MissileMobj->info->seesound);
     }
+
+    if(!linetarget)
+    {
+        fixed_t pitch = (source->player->lookdir / 256);
+
+//        slope = pitch;
+	slope = (source->player->lookdir << FRACBITS) / 173;
+
+        if(pitch < 0)
+            pitch = pitch + FRACUNIT;
+        else
+            pitch = FRACUNIT - pitch;
+
+        aim = FixedMul(MissileMobj->info->speed, pitch);
+    }
+    else
+        aim = MissileMobj->info->speed;
+
     MissileMobj->target = source;
     MissileMobj->angle = an;
+/*
     MissileMobj->momx = FixedMul(MissileMobj->info->speed,
                                  finecosine[an >> ANGLETOFINESHIFT]);
     MissileMobj->momy = FixedMul(MissileMobj->info->speed,
                                  finesine[an >> ANGLETOFINESHIFT]);
+*/
+    MissileMobj->momx = FixedMul(aim, finecosine[an>>ANGLETOFINESHIFT]);
+    MissileMobj->momy = FixedMul(aim, finesine[an>>ANGLETOFINESHIFT]);
+
     MissileMobj->momz = FixedMul(MissileMobj->info->speed, slope);
     if (MissileMobj->type == MT_BLASTERFX1)
     {                           // Ultra-fast ripper spawning missile

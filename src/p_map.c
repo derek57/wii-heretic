@@ -1168,6 +1168,11 @@ void P_SlideMove(mobj_t * mo)
 
 mobj_t *linetarget;             // who got hit (or NULL)
 mobj_t *shootthing;
+
+fixed_t         shootdirx;
+fixed_t         shootdiry;
+fixed_t         shootdirz;
+
 fixed_t shootz;                 // height if not aiming up or down
                                                                         // ???: use slope for monsters?
 int la_damage;
@@ -1405,8 +1410,20 @@ fixed_t P_AimLineAttack(mobj_t * t1, angle_t angle, fixed_t distance)
 
     angle >>= ANGLETOFINESHIFT;
     shootthing = t1;
-    x2 = t1->x + (distance >> FRACBITS) * finecosine[angle];
-    y2 = t1->y + (distance >> FRACBITS) * finesine[angle];
+    if(t1->player)
+    {
+	// for player pitch aiming
+        angle_t pitch = ((t1->player->lookdir / 256) << 14);
+        pitch >>= ANGLETOFINESHIFT;
+
+        x2 = t1->x + FixedMul(FixedMul(finecosine[pitch], finecosine[angle]), distance);
+        y2 = t1->y + FixedMul(FixedMul(finecosine[pitch], finesine[angle]), distance);
+    }
+    else
+    {
+        x2 = t1->x + (distance>>FRACBITS)*finecosine[angle];
+        y2 = t1->y + (distance>>FRACBITS)*finesine[angle];
+    }
     shootz = t1->z + (t1->height >> 1) + 8 * FRACUNIT;
     topslope = 100 * FRACUNIT / 160;    // can't shoot outside view angles
     bottomslope = -100 * FRACUNIT / 160;
@@ -1418,6 +1435,11 @@ fixed_t P_AimLineAttack(mobj_t * t1, angle_t angle, fixed_t distance)
 
     if (linetarget)
         return aimslope;
+    else    // checks for player pitch
+    {
+        if(t1->player)
+            return t1->player->lookdir / 200;
+    }
     return 0;
 }
 
@@ -1438,11 +1460,11 @@ void P_LineAttack(mobj_t * t1, angle_t angle, fixed_t distance, fixed_t slope,
 {
     fixed_t x2, y2;
 
+    int traverseflags;
+
     angle >>= ANGLETOFINESHIFT;
     shootthing = t1;
     la_damage = damage;
-    x2 = t1->x + (distance >> FRACBITS) * finecosine[angle];
-    y2 = t1->y + (distance >> FRACBITS) * finesine[angle];
     shootz = t1->z + (t1->height >> 1) + 8 * FRACUNIT;
     if (t1->flags2 & MF2_FEETARECLIPPED)
     {
@@ -1451,7 +1473,37 @@ void P_LineAttack(mobj_t * t1, angle_t angle, fixed_t distance, fixed_t slope,
     attackrange = distance;
     aimslope = slope;
 
-    P_PathTraverse(t1->x, t1->y, x2, y2, PT_ADDLINES | PT_ADDTHINGS,
+    if(t1->player)
+    {
+	// for player pitch aiming
+        angle_t pitch = ((t1->player->lookdir / 256) << 14);
+        pitch >>= ANGLETOFINESHIFT;
+
+        shootdirx = FixedMul(FixedMul(finecosine[pitch], finecosine[angle]), distance);
+        shootdiry = FixedMul(FixedMul(finecosine[pitch], finesine[angle]), distance);
+
+        x2 = t1->x + shootdirx;
+        y2 = t1->y + shootdiry;
+    }
+    else
+    {
+        x2 = t1->x + (distance>>FRACBITS)*finecosine[angle];
+        y2 = t1->y + (distance>>FRACBITS)*finesine[angle];
+
+        shootdirx = x2 - t1->x;
+        shootdiry = y2 - t1->y;
+    }
+
+    // for plane hit detection
+    shootdirz = aimslope;
+
+    // test lines only if damage is <= 0
+    if(damage >= 1)
+        traverseflags = (PT_ADDLINES|PT_ADDTHINGS);
+    else
+        traverseflags = PT_ADDLINES;
+
+    P_PathTraverse(t1->x, t1->y, x2, y2, traverseflags,
                    PTR_ShootTraverse);
 }
 
