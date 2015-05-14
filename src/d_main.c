@@ -87,8 +87,10 @@ boolean do_not_repeat_music = false;
 
 boolean nomonsters;             // checkparm of -nomonsters
 boolean respawnparm;            // checkparm of -respawn
+boolean fastparm;               // checkparm of -fast
 
 boolean start_respawnparm;
+boolean start_fastparm;
 
 extern boolean debugmode /*= false*/;	// checkparm of -debug
 /*
@@ -1052,6 +1054,14 @@ void D_DoomMain(void)
     //!
     // @vanilla
     //
+    // Monsters move faster.
+    //
+
+    fastparm = M_ParmExists("-fast");
+
+    //!
+    // @vanilla
+    //
     // Take screenshots when F1 is pressed.
     //
 
@@ -1180,6 +1190,7 @@ void D_DoomMain(void)
     M_LoadDefaults();
 
     respawnparm = false;
+    fastparm = false;
 
     if(mus_engine > 1)
 	mus_engine = 2;
@@ -1327,6 +1338,7 @@ void D_DoomMain(void)
     D_ConnectNetGame();
 
     start_respawnparm = respawnparm;
+    start_fastparm = fastparm;
 /*
     // haleyjd: removed WATCOMC
     initStartup();
@@ -1343,6 +1355,8 @@ void D_DoomMain(void)
         status(DEH_String("No Monsters..."));
     if (respawnparm)
         status(DEH_String("Respawning..."));
+    if (fastparm)
+        status(DEH_String("Fast Monsters..."));
 
     if (autostart)
     {

@@ -127,6 +127,7 @@ static void LoadGameSettings(net_gamesettings_t *settings)
     // TODO startloadgame = settings->loadgame;
     nomonsters = settings->nomonsters;
     respawnparm = settings->respawn_monsters;
+    fastparm = settings->fast_monsters;
     consoleplayer = settings->consoleplayer;
 
     for (i = 0; i < MAXPLAYERS; ++i)
@@ -151,6 +152,7 @@ static void SaveGameSettings(net_gamesettings_t *settings)
     settings->gameversion = exe_heretic_1_3;
     settings->nomonsters = nomonsters;
     settings->respawn_monsters = respawnparm;
+    settings->fast_monsters = fastparm;
     settings->timelimit = 0;
 //    settings->lowres_turn = false;
 }

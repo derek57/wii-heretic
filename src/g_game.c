@@ -96,6 +96,7 @@ gameaction_t gameaction;
 gamestate_t gamestate;
 skill_t gameskill;
 boolean respawnmonsters;
+boolean fastmonsters;
 int gameepisode;
 int gamemap;
 int prevmap;
@@ -2010,6 +2011,7 @@ void G_DeferedInitNew(skill_t skill, int episode, int map)
 void G_DoNewGame(void)
 {
     respawnparm = start_respawnparm;
+    fastparm = start_fastparm;
 
     G_InitNew(d_skill, d_episode, d_map);
     gameaction = ga_nothing;
@@ -2050,8 +2052,16 @@ void G_InitNew(skill_t skill, int episode, int map)
     {
         respawnmonsters = false;
     }
+    if (fastparm)
+    {
+        fastmonsters = true;
+    }
+    else
+    {
+        fastmonsters = false;
+    }
     // Set monster missile speeds
-    speed = skill == sk_nightmare;
+    speed = skill == sk_nightmare || fastparm;
     for (i = 0; MonsterMissileInfo[i].type != -1; i++)
     {
         mobjinfo[MonsterMissileInfo[i].type].speed
@@ -2201,6 +2211,7 @@ void G_DoPlayDemo(void)
     skill = *demo_p++;
     episode = *demo_p++;
     map = *demo_p++;
+    fastparm = *demo_p++;
 
     for (i = 0; i < MAXPLAYERS; i++)
         playeringame[i] = *demo_p++;
@@ -2289,6 +2300,7 @@ boolean G_CheckDemoStatus(void)
         W_ReleaseLumpName(defdemoname);
         demoplayback = false;
         respawnparm = start_respawnparm;
+        fastparm = start_fastparm;
         D_AdvanceDemo();
         return true;
     }
