@@ -1666,6 +1666,7 @@ void G_PlayerReborn(int player)
     p->messageTics = 0;
     p->lookdir = 0;
     p->ammo[am_goldwand] = 50;
+    p->recoilpitch = 0;
     for (i = 0; i < NUMAMMO; i++)
     {
         p->maxammo[i] = maxammo[i];

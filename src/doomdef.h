@@ -482,6 +482,9 @@ typedef struct player_s
 
     unsigned int jumpTics;      // delay the next jump for a moment
     unsigned int worldTimer;    // total time the player's been playing
+
+    int recoilpitch;
+
 } player_t;
 
 #define CF_NOCLIP		1

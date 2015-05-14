@@ -44,6 +44,8 @@ boolean onground;
 int newtorch;                   // used in the torch flicker effect.
 int newtorchdelta;
 
+extern boolean d_recoil;
+
 boolean WeaponInShareware[] = {
     true,                       // Staff
     true,                       // Gold wand
@@ -794,6 +796,18 @@ void P_PlayerThink(player_t * player)
     {
         player->fixedcolormap = 0;
     }
+
+    if(player->recoilpitch && d_recoil)
+    {
+        fixed_t recoil = (player->recoilpitch >> 3);
+
+        if(player->recoilpitch - recoil > 0)
+            player->recoilpitch -= recoil;
+        else
+            player->recoilpitch = 0;
+    }
+    else
+        player->recoilpitch = 0;
 }
 
 //----------------------------------------------------------------------------

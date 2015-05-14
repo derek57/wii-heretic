@@ -156,6 +156,7 @@ static void SCCrosshair(int option);
 static void SCJumping(int option);
 static void SCStats(int option);
 static void SCMouselook(int option);
+static void SCWeaponRecoil(int option);
 
 static void SCArtifact(int option);
 static void SCQuartz(int option);
@@ -308,6 +309,7 @@ boolean fake = false;
 boolean refreshing = false;		// WII INVENTORY UPSTREAM FIX #3
 boolean inside_menu = false;		// WII INVENTORY UPSTREAM FIX #3
 boolean mus_cheat_used = false;
+boolean d_recoil = true;
 
 int ninty;
 int FramesPerSecond;
@@ -330,8 +332,8 @@ int rmap = 1;
 int rskill = 0;
 int mus_engine = 1;
 
-int key_bindings_start_in_cfg_at_pos = 20;
-int key_bindings_end_in_cfg_at_pos = 37;
+int key_bindings_start_in_cfg_at_pos = 21;
+int key_bindings_end_in_cfg_at_pos = 38;
 /*
 int memory_info = 0;
 int battery_info = 0;
@@ -856,6 +858,7 @@ static Menu_t SystemMenu = {
 };
 
 static MenuItem_t GameItems[] = {
+/*
     {ITT_EFUNC, "MAP GRID", SCGrid, 0, MENU_NONE},
     {ITT_EFUNC, "FOLLOW MODE", SCFollow, 0, MENU_NONE},
     {ITT_LRFUNC, "ROTATION", SCRotate, 0, MENU_NONE},
@@ -864,11 +867,22 @@ static MenuItem_t GameItems[] = {
     {ITT_EFUNC, "MESSAGES", SCMessages, 0, MENU_NONE},
     {ITT_EFUNC, "CROSSHAIR", SCCrosshair, 0, MENU_NONE},
     {ITT_EFUNC, "JUMPING", SCJumping, 0, MENU_NONE},
-    {ITT_EFUNC, "WEAPON CHANGE", SCWeaponChange, 0, MENU_NONE}
+    {ITT_EFUNC, "WEAPON CHANGE", SCWeaponChange, 0, MENU_NONE},
+    {ITT_EFUNC, "WEAPON RECOIL", SCWeaponRecoil, 0, MENU_NONE}
+*/
+    {ITT_EFUNC, "", SCGrid, 0, MENU_NONE},
+    {ITT_EFUNC, "", SCRotate, 0, MENU_NONE},
+    {ITT_LRFUNC, "", SCFollow, 0, MENU_NONE},
+    {ITT_EFUNC, "", SCStats, 0, MENU_NONE},
+    {ITT_EFUNC, "", SCMessages, 0, MENU_NONE},
+    {ITT_EFUNC, "", SCCrosshair, 0, MENU_NONE},
+    {ITT_EFUNC, "", SCJumping, 0, MENU_NONE},
+    {ITT_EFUNC, "", SCWeaponChange, 0, MENU_NONE},
+    {ITT_LRFUNC, "", SCWeaponRecoil, 0, MENU_NONE}
 };
 
 static Menu_t GameMenu = {
-    50, 10,
+    65, 10,
     DrawGameMenu,
     9, GameItems,
     0,
@@ -1464,6 +1478,7 @@ void MN_Drawer(void)
 		   CurrentMenu==&ArtifactsMenu	||
 		   CurrentMenu==&KeysMenu	||
 		   CurrentMenu==&WeaponsMenu	||
+	           CurrentMenu==&GameMenu	||
 		   CurrentMenu==&BindingsMenu)
 			MN_DrTextA(item->text, x, y);
 		else if(CurrentMenu)
@@ -1474,6 +1489,7 @@ void MN_Drawer(void)
 		CurrentMenu==&ArtifactsMenu	||
 		CurrentMenu==&KeysMenu		||
 		CurrentMenu==&WeaponsMenu	||
+	        CurrentMenu==&GameMenu		||
 		CurrentMenu==&BindingsMenu)
 			y += ITEM_HEIGHT_SMALL;
 	    else if(CurrentMenu)
@@ -1486,6 +1502,7 @@ void MN_Drawer(void)
 	   CurrentMenu==&ArtifactsMenu		||
 	   CurrentMenu==&KeysMenu		||
 	   CurrentMenu==&WeaponsMenu		||
+	   CurrentMenu==&GameMenu		||
 	   CurrentMenu==&BindingsMenu)
 	{
 	    y = CurrentMenu->y+(CurrentItPos*ITEM_HEIGHT_SMALL)+SELECTOR_YOFFSET_SMALL;
@@ -1742,6 +1759,7 @@ static void DrawSystemMenu(void)
 
 static void DrawGameMenu(void)
 {
+/*
     if(drawgrid == 1)
 	MN_DrTextB("ON", 245, 10);
     else if(drawgrid == 0)
@@ -1786,6 +1804,61 @@ static void DrawGameMenu(void)
 
     SB_state = -1;
     UpdateState |= I_FULLSCRN;
+*/
+    MN_DrTextA(DEH_String("MAP GRID"), 70, 10);
+    MN_DrTextA(DEH_String("MAP ROTATION"), 70, 20);
+    MN_DrTextA(DEH_String("FOLLOW MODE"), 70, 30);
+    MN_DrTextA(DEH_String("STATISTICS"), 70, 40);
+    MN_DrTextA(DEH_String("MESSAGES"), 70, 50);
+    MN_DrTextA(DEH_String("CROSSHAIR"), 70, 60);
+    MN_DrTextA(DEH_String("JUMPING"), 70, 70);
+    MN_DrTextA(DEH_String("WEAPON CHANGE"), 70, 80);
+    MN_DrTextA(DEH_String("WEAPON RECOIL"), 70, 90);
+
+    if(drawgrid == 1)
+	MN_DrTextA("ON", 235, 10);
+    else if(drawgrid == 0)
+	MN_DrTextA("OFF", 235, 10);
+
+    if(am_rotate == true)
+	MN_DrTextA("ON", 235, 20);
+    else if(am_rotate == false)
+	MN_DrTextA("OFF", 235, 20);
+
+    if(followplayer)
+	MN_DrTextA("ON", 235, 30);
+    else
+	MN_DrTextA("OFF", 235, 30);
+
+    if(show_stats)
+	MN_DrTextA("ON", 235, 40);
+    else
+	MN_DrTextA("OFF", 235, 40);
+
+    if(messageson)
+	MN_DrTextA("ON", 235, 50);
+    else
+	MN_DrTextA("OFF", 235, 50);
+
+    if(crosshair)
+	MN_DrTextA("ON", 235, 60);
+    else
+	MN_DrTextA("OFF", 235, 60);
+
+    if(jumping)
+	MN_DrTextA("ON", 235, 70);
+    else
+	MN_DrTextA("OFF", 235, 70);
+
+    if(use_vanilla_weapon_change)
+	MN_DrTextA("SLOW", 235, 80);
+    else
+	MN_DrTextA("FAST", 235, 80);
+
+    if(d_recoil)
+	MN_DrTextA("ON", 235, 90);
+    else
+	MN_DrTextA("OFF", 235, 90);
 }
 
 //---------------------------------------------------------------------------
@@ -2236,7 +2309,6 @@ static void ClearControls (int cctrlskey)
 
 static void ClearKeys (int option)
 {
-    *doom_defaults_list[20].location = 0;
     *doom_defaults_list[21].location = 0;
     *doom_defaults_list[22].location = 0;
     *doom_defaults_list[23].location = 0;
@@ -2253,27 +2325,28 @@ static void ClearKeys (int option)
     *doom_defaults_list[34].location = 0;
     *doom_defaults_list[35].location = 0;
     *doom_defaults_list[36].location = 0;
+    *doom_defaults_list[37].location = 0;
 }
 
 static void ResetKeys (int option)
 {
-    *doom_defaults_list[20].location = CLASSIC_CONTROLLER_R;
-    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_L;
-    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_MINUS;
-    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_LEFT;
-    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_DOWN;
-    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_RIGHT;
-    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_ZL;
-    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_ZR;
-    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_Y;
-    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_A;
-    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_PLUS;
-    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_X;
-    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_B;
-    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_UP;
-    *doom_defaults_list[34].location = CLASSIC_CONTROLLER_HOME;
-    *doom_defaults_list[35].location = CONTROLLER_1;
-    *doom_defaults_list[36].location = CONTROLLER_2;
+    *doom_defaults_list[21].location = CLASSIC_CONTROLLER_R;
+    *doom_defaults_list[22].location = CLASSIC_CONTROLLER_L;
+    *doom_defaults_list[23].location = CLASSIC_CONTROLLER_MINUS;
+    *doom_defaults_list[24].location = CLASSIC_CONTROLLER_LEFT;
+    *doom_defaults_list[25].location = CLASSIC_CONTROLLER_DOWN;
+    *doom_defaults_list[26].location = CLASSIC_CONTROLLER_RIGHT;
+    *doom_defaults_list[27].location = CLASSIC_CONTROLLER_ZL;
+    *doom_defaults_list[28].location = CLASSIC_CONTROLLER_ZR;
+    *doom_defaults_list[29].location = CLASSIC_CONTROLLER_Y;
+    *doom_defaults_list[30].location = CLASSIC_CONTROLLER_A;
+    *doom_defaults_list[31].location = CLASSIC_CONTROLLER_PLUS;
+    *doom_defaults_list[32].location = CLASSIC_CONTROLLER_X;
+    *doom_defaults_list[33].location = CLASSIC_CONTROLLER_B;
+    *doom_defaults_list[34].location = CLASSIC_CONTROLLER_UP;
+    *doom_defaults_list[35].location = CLASSIC_CONTROLLER_HOME;
+    *doom_defaults_list[36].location = CONTROLLER_1;
+    *doom_defaults_list[37].location = CONTROLLER_2;
 }
 
 //---------------------------------------------------------------------------
@@ -2411,7 +2484,7 @@ boolean MN_Responder(event_t * event)
     if (askforkey && data->btns_d)		// KEY BINDINGS
     {
 	ClearControls(event->data1);
-	*doom_defaults_list[keyaskedfor + 20 + FirstKey].location = event->data1;
+	*doom_defaults_list[keyaskedfor + 21 + FirstKey].location = event->data1;
 	askforkey = false;
 	return true;
     }
@@ -2826,7 +2899,7 @@ boolean MN_Responder(event_t * event)
 		{
 		    if (FirstKey == 0)
 		    {
-			CurrentItPos = 19; // End of Key menu (14 == 15 (max lines on a page) - 1)
+			CurrentItPos = 20; // End of Key menu (14 == 15 (max lines on a page) - 1)
 			FirstKey = FIRSTKEY_MAX;
 		    }
 		    else
@@ -3266,6 +3339,21 @@ static void SCMouselook(int option)
 	mouselook--;
 }
 
+static void SCWeaponRecoil(int option)
+{
+    if(option == RIGHT_DIR)
+    {
+        if (!d_recoil)
+            d_recoil = true;
+        players[consoleplayer].message = DEH_String("WEAPON RECOIL ON");
+    }
+    else if(d_recoil)
+    {
+        d_recoil = false;
+        players[consoleplayer].message = DEH_String("WEAPON RECOIL OFF");
+    }
+}
+
 static void SCMouseSpeed(int option)
 {
     if(option == RIGHT_DIR)
@@ -3444,7 +3532,7 @@ static void DrawBindingsMenu(void)
 	if (askforkey && keyaskedfor == ctrls)
 	    MN_DrTextA("???", 195, (ctrls*10+5));
 	else
-	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+20].location)),195,(ctrls*10+5));
+	    MN_DrTextA(Key2String(*(doom_defaults_list[ctrls+FirstKey+21].location)),195,(ctrls*10+5));
     }
 
 /*

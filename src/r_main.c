@@ -772,7 +772,10 @@ void R_SetupFrame(player_t * player)
     viewz = player->viewz;
 
 //    tempCentery = viewheight / 2 + (player->lookdir) * screenblocks / 10;		// CHANGED FOR HIRES
-    tempCentery = viewheight / 2 + ((player->lookdir) << hires) * screenblocks / 10;	// CHANGED FOR HIRES
+//    tempCentery = viewheight / 2 + ((player->lookdir) << hires) * screenblocks / 10;	// CHANGED FOR HIRES
+    tempCentery = (viewheight / 2) + ((player->recoilpitch / (SCREENWIDTH * 32)) +
+                  (player->lookdir << ((hires && !detailshift)) * (screenblocks / 10)));
+
     if (centery != tempCentery)
     {
         centery = tempCentery;

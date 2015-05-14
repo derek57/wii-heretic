@@ -179,6 +179,7 @@ extern int key_invright, key_invuse;
     CONFIG_VARIABLE_INT		(xhair),
     CONFIG_VARIABLE_INT		(jump),
     CONFIG_VARIABLE_INT		(music_engine),
+    CONFIG_VARIABLE_INT		(recoil),
     CONFIG_VARIABLE_INT		(key_fire),
     CONFIG_VARIABLE_INT		(key_use),
     CONFIG_VARIABLE_INT		(key_menu),

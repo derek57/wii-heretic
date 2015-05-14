@@ -45,6 +45,8 @@
 
 int use_vanilla_weapon_change = 1;
 
+extern boolean d_recoil;
+
 static int MaceSpotCount;
 
 static struct
@@ -980,6 +982,9 @@ void A_FireBlasterPL1(player_t * player, pspdef_t * psp)
     PuffType = MT_BLASTERPUFF1;
     P_LineAttack(mo, angle, MISSILERANGE, bulletslope, damage);
     S_StartSound(player->mo, sfx_blssht);
+
+    if(d_recoil)
+        player->recoilpitch = (14*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1000,6 +1005,9 @@ void A_FireBlasterPL2(player_t * player, pspdef_t * psp)
         mo->thinker.function = P_BlasterMobjThinker;
     }
     S_StartSound(player->mo, sfx_blssht);
+
+    if(d_recoil)
+        player->recoilpitch = (14*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1026,6 +1034,9 @@ void A_FireGoldWandPL1(player_t * player, pspdef_t * psp)
     PuffType = MT_GOLDWANDPUFF1;
     P_LineAttack(mo, angle, MISSILERANGE, bulletslope, damage);
     S_StartSound(player->mo, sfx_gldhit);
+
+    if(d_recoil)
+        player->recoilpitch = (6*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1058,6 +1069,9 @@ void A_FireGoldWandPL2(player_t * player, pspdef_t * psp)
         angle += ((ANG45 / 8) * 2) / 4;
     }
     S_StartSound(player->mo, sfx_gldhit);
+
+    if(d_recoil)
+        player->recoilpitch = (6*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1131,6 +1145,9 @@ void A_FireMacePL1(player_t * player, pspdef_t * psp)
     {
         ball->special1.i = 16;    // tics till dropoff
     }
+
+    if(d_recoil)
+        player->recoilpitch = (10*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1266,6 +1283,9 @@ void A_FireMacePL2(player_t * player, pspdef_t * psp)
         }
     }
     S_StartSound(player->mo, sfx_lobsht);
+
+    if(d_recoil)
+        player->recoilpitch = (10*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1378,6 +1398,9 @@ void A_FireCrossbowPL1(player_t * player, pspdef_t * psp)
     P_SpawnPlayerMissile(pmo, MT_CRBOWFX1);
     P_SPMAngle(pmo, MT_CRBOWFX3, pmo->angle - (ANG45 / 10));
     P_SPMAngle(pmo, MT_CRBOWFX3, pmo->angle + (ANG45 / 10));
+
+    if(d_recoil)
+        player->recoilpitch = (8*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1398,6 +1421,9 @@ void A_FireCrossbowPL2(player_t * player, pspdef_t * psp)
     P_SPMAngle(pmo, MT_CRBOWFX2, pmo->angle + (ANG45 / 10));
     P_SPMAngle(pmo, MT_CRBOWFX3, pmo->angle - (ANG45 / 5));
     P_SPMAngle(pmo, MT_CRBOWFX3, pmo->angle + (ANG45 / 5));
+
+    if(d_recoil)
+        player->recoilpitch = (8*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1439,6 +1465,9 @@ void A_FireSkullRodPL1(player_t * player, pspdef_t * psp)
     {
         P_SetMobjState(mo, S_HRODFX1_2);
     }
+
+    if(d_recoil)
+        player->recoilpitch = (12*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1474,6 +1503,9 @@ void A_FireSkullRodPL2(player_t * player, pspdef_t * psp)
         MissileMobj->special1.m = linetarget;
     }
     S_StartSound(MissileMobj, sfx_hrnpow);
+
+    if(d_recoil)
+        player->recoilpitch = (12*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1640,6 +1672,9 @@ void A_FirePhoenixPL1(player_t * player, pspdef_t * psp)
     angle >>= ANGLETOFINESHIFT;
     player->mo->momx += FixedMul(4 * FRACUNIT, finecosine[angle]);
     player->mo->momy += FixedMul(4 * FRACUNIT, finesine[angle]);
+
+    if(d_recoil)
+        player->recoilpitch = (10*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
@@ -1735,6 +1770,9 @@ void A_FirePhoenixPL2(player_t * player, pspdef_t * psp)
         S_StartSound(player->mo, sfx_phopow);
     }
     P_CheckMissileSpawn(mo);
+
+    if(d_recoil)
+        player->recoilpitch = (10*FRACUNIT);
 }
 
 //----------------------------------------------------------------------------
