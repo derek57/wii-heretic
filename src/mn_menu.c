@@ -949,7 +949,7 @@ static MenuItem_t WeaponsItems[] = {
     {ITT_EFUNC, "HELLSTAFF", SCWeaponD, 0, MENU_NONE},
     {ITT_EFUNC, "PHOENIX ROD", SCWeaponE, 0, MENU_NONE},
     {ITT_EFUNC, "FIREMACE", SCWeaponF, 0, MENU_NONE},
-    {ITT_EFUNC, "BACKPACK", SCWeaponH, 0, MENU_NONE}
+    {ITT_EFUNC, "BAG OF HOLDING", SCWeaponH, 0, MENU_NONE}
 };
 
 static MenuItem_t ArtifactsItems[] = {
@@ -4365,7 +4365,7 @@ static void SCWeaponH(int option)
             }
             player->backpack = true;
         }
-	P_SetMessage(player, DEH_String("BACKPACK ADDED"), false);
+	P_SetMessage(player, DEH_String("BAG OF HOLDING ADDED"), false);
     }
 }
 
