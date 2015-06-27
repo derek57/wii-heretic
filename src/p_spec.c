@@ -24,6 +24,8 @@
 
 // P_Spec.c
 
+#include <malloc.h>
+
 #include "doomdef.h"
 #include "deh_str.h"
 #include "i_system.h"
@@ -195,7 +197,8 @@ animdef_t animdefs[] = {
     {-1}
 };
 
-anim_t anims[MAXANIMS];
+static anim_t   *anims;         // new structure w/o limits -- killough
+static size_t   maxanims;
 anim_t *lastanim;
 
 int *TerrainTypes;
@@ -261,15 +264,23 @@ void P_InitTerrainTypes(void)
 
 void P_InitPicAnims(void)
 {
-    char *startname;
-    char *endname;
     int i;
 
     lastanim = anims;
-    for (i = 0; animdefs[i].istexture != -1; i++)
+    for (i = 0; animdefs[i].endname[0]; i++)
     {
-        startname = DEH_String(animdefs[i].startname);
-        endname = DEH_String(animdefs[i].endname);
+        char    *startname = animdefs[i].startname;
+        char    *endname = animdefs[i].endname;
+
+        // 1/11/98 killough -- removed limit by array-doubling
+        if (lastanim >= anims + maxanims)
+        {
+            size_t      newmax = (maxanims ? maxanims * 2 : MAXANIMS);
+ 
+            anims = realloc(anims, newmax * sizeof(*anims));
+            lastanim = anims + maxanims;
+            maxanims = newmax;
+        }
 
         if (animdefs[i].istexture)
         {                       // Texture animation
@@ -279,6 +290,8 @@ void P_InitPicAnims(void)
             }
             lastanim->picnum = R_TextureNumForName(endname);
             lastanim->basepic = R_TextureNumForName(startname);
+
+            lastanim->numpics = lastanim->picnum - lastanim->basepic + 1;
         }
         else
         {                       // Flat animation
@@ -288,14 +301,10 @@ void P_InitPicAnims(void)
             }
             lastanim->picnum = R_FlatNumForName(endname);
             lastanim->basepic = R_FlatNumForName(startname);
+
+            lastanim->numpics = lastanim->picnum - lastanim->basepic + 1;
         }
         lastanim->istexture = animdefs[i].istexture;
-        lastanim->numpics = lastanim->picnum - lastanim->basepic + 1;
-        if (lastanim->numpics < 2)
-        {
-            I_Error("P_InitPicAnims: bad cycle from %s to %s",
-                    startname, endname);
-        }
         lastanim->speed = animdefs[i].speed;
         lastanim++;
     }

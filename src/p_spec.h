@@ -57,7 +57,6 @@ typedef struct
 
 #define	MAXANIMS		32
 
-extern anim_t anims[MAXANIMS], *lastanim;
 extern int *TerrainTypes;
 
 //
