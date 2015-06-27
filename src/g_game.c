@@ -207,6 +207,8 @@ int dclicktime2, dclickstate2, dclicks2;
 int joyxmove, joyymove;         // joystick values are repeated
 boolean joyarray[MAX_JOY_BUTTONS + 1];
 boolean *joybuttons = &joyarray[1];     // allow [-1]
+boolean not_walking;
+
 static int      joyirx;
 static int      joyiry;
 
@@ -570,11 +572,19 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
 	    cmd->angleturn += angleturn/*[tspeed]*/;
 
         if (joyxmove > 20) 
+        {
             side += sidemve/*[speed]*/; 
 //            cmd->angleturn -= angleturn[tspeed]; 
-        if (joyxmove < -20) 
+            not_walking = false;
+        }
+        else if (joyxmove < -20) 
+        {
             side -= sidemve/*[speed]*/; 
 //            cmd->angleturn += angleturn[tspeed]; 
+            not_walking = false;
+        }
+        else
+            not_walking = true;
 
         if (joyirx > 0)     // calculate wii IR curve based on input
             cmd->angleturn -= turnspd * joyirx;
@@ -614,9 +624,17 @@ void G_BuildTiccmd(ticcmd_t *cmd, int maketic)
     }
 
     if (joyymove > 20)
+    {
         forward += forwardmve/*[speed]*/;
-    if (joyymove < -20)
+        not_walking = false;
+    }
+    else if (joyymove < -20)
+    {
         forward -= forwardmve/*[speed]*/;
+        not_walking = false;
+    }
+    else
+        not_walking = true;
 
     if (/*gamekeydown[key_straferight] || mousebuttons[mousebstraferight]
      ||*/ joybuttons[joybstraferight])

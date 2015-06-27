@@ -41,6 +41,7 @@ mobjtype_t PuffType;
 mobj_t *MissileMobj;
 
 extern boolean autoaim;
+extern boolean not_walking;
 
 static fixed_t FloatBobOffsets[64] = {
     0, 51389, 102283, 152192,
@@ -376,6 +377,7 @@ void P_XYMovement(mobj_t * mo)
         {                       // Blocked move
             if (mo->flags2 & MF2_SLIDE)
             {                   // Try to slide along it
+                not_walking = true;
                 P_SlideMove(mo);
             }
             else if (mo->flags & MF_MISSILE)

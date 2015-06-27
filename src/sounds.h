@@ -290,6 +290,13 @@ typedef enum
     sfx_amb9,
     sfx_amb10,
     sfx_amb11,
+
+    sfx_step0,
+    sfx_step1,
+    sfx_step2,
+    sfx_step3,
+    sfx_water,
+    sfx_sludge,
     NUMSFX
 } sfxenum_t;
 

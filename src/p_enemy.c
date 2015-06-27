@@ -49,7 +49,10 @@ typedef struct
     angle_t angle;
 } BossSpot_t;
 
-extern boolean fastparm;
+int               old_t;
+
+extern boolean    not_walking;
+extern boolean    fastparm;
 
 // Private Data
 
@@ -2707,3 +2710,23 @@ void A_UnHideThing(mobj_t * actor)
     //P_SetThingPosition(actor);
     actor->flags2 &= ~MF2_DONTDRAW;
 }
+
+void A_Footstep (mobj_t* mo)
+{
+    int t = P_Random() % 4;
+
+    if(old_t == t)
+        t = P_Random() % 4;
+
+    if(!not_walking)
+    {
+        if(P_GetThingFloorType(mo) == 0)
+            S_StartSound (mo, sfx_step0 + t);
+        else if(P_GetThingFloorType(mo) == 1)
+            S_StartSound (mo, sfx_water);
+        else
+            S_StartSound (mo, sfx_sludge);
+    }
+    old_t = t;
+}
+

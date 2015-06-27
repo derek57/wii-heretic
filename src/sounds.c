@@ -253,5 +253,12 @@ sfxinfo_t S_sfx[] = {
     SOUND("amb8",    1,   1),
     SOUND("amb9",    1,   1),
     SOUND("amb10",   1,   1),
-    SOUND("amb11",   1,   0)
+    SOUND("amb11",   1,   0),
+
+    SOUND("step0",  32,  2),
+    SOUND("step1",  32,  2),
+    SOUND("step2",  32,  2),
+    SOUND("step3",  32,  2),
+    SOUND("water",  32,  2),
+    SOUND("sludge",  32,  2)
 };
