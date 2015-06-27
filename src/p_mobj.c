@@ -1054,6 +1054,43 @@ void P_SpawnPlayer(mapthing_t * mthing)
     }
 }
 
+//
+// P_FindDoomedNum
+//
+// Finds a mobj type with a matching doomednum
+// killough 8/24/98: rewrote to use hashing
+//
+int P_FindDoomedNum(unsigned int type)
+{
+    static struct
+    {
+        int     first;
+        int     next;
+    } *hash;
+
+    int i;
+
+    if (!hash)
+    {
+        hash = Z_Malloc(sizeof(*hash) * NUMMOBJTYPES, PU_CACHE, (void **)&hash);
+        for (i = 0; i < NUMMOBJTYPES; i++)
+            hash[i].first = NUMMOBJTYPES;
+        for (i = 0; i < NUMMOBJTYPES; i++)
+            if (mobjinfo[i].doomednum != -1)
+            {
+                unsigned int    h = (unsigned int)mobjinfo[i].doomednum % NUMMOBJTYPES;
+
+                hash[i].next = hash[h].first;
+                hash[h].first = i;
+            }
+    }
+
+    i = hash[type % NUMMOBJTYPES].first;
+    while ((i < NUMMOBJTYPES) && ((unsigned int)mobjinfo[i].doomednum != type))
+        i = hash[i].next;
+    return i;
+}
+
 //----------------------------------------------------------------------------
 //
 // PROC P_SpawnMapThing
@@ -1068,6 +1105,7 @@ void P_SpawnMapThing(mapthing_t * mthing)
     int bit;
     mobj_t *mobj;
     fixed_t x, y, z;
+    short type = mthing->type;
 
 // count deathmatch start positions
 
@@ -1124,9 +1162,8 @@ void P_SpawnMapThing(mapthing_t * mthing)
         return;
 
 // find which type to spawn
-    for (i = 0; i < NUMMOBJTYPES; i++)
-        if (mthing->type == mobjinfo[i].doomednum)
-            break;
+    // killough 8/23/98: use table for faster lookup
+    i = P_FindDoomedNum(type);
 
     if (i == NUMMOBJTYPES)
         I_Error("P_SpawnMapThing: Unknown type %i at (%i, %i)", mthing->type,
