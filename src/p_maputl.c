@@ -489,7 +489,7 @@ boolean P_BlockThingsIterator(int x, int y, boolean(*func) (mobj_t *))
 intercept_t      *intercepts, *intercept_p;
 
 // Check for limit and double size if necessary -- killough
-static void check_intercept(void)
+void check_intercept(void)
 {
     static size_t       num_intercepts;
     size_t              offset = intercept_p - intercepts;

@@ -130,6 +130,8 @@ boolean P_SightBlockLinesIterator(int x, int y)
         if (!ld->backsector)
             return false;       // stop checking
 
+        check_intercept();  // killough
+
         // store the line for later intersection testing
         intercept_p->d.line = ld;
         intercept_p++;
