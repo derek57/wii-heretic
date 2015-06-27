@@ -486,7 +486,21 @@ boolean P_BlockThingsIterator(int x, int y, boolean(*func) (mobj_t *))
 ===============================================================================
 */
 
-intercept_t intercepts[MAXINTERCEPTS], *intercept_p;
+intercept_t      *intercepts, *intercept_p;
+
+// Check for limit and double size if necessary -- killough
+static void check_intercept(void)
+{
+    static size_t       num_intercepts;
+    size_t              offset = intercept_p - intercepts;
+
+    if (offset >= num_intercepts)
+    {
+        num_intercepts = (num_intercepts ? num_intercepts * 2 : 128);
+        intercepts = (intercept_t *)realloc(intercepts, sizeof(*intercepts) * num_intercepts);
+        intercept_p = intercepts + offset;
+    }
+}
 
 divline_t trace;
 boolean earlyout;
@@ -532,6 +546,8 @@ boolean PIT_AddLineIntercepts(line_t * ld)
     frac = P_InterceptVector(&trace, &dl);
     if (frac < 0)
         return true;            // behind source
+
+    check_intercept();  // killough
 
 // try to early out the check
     if (earlyout && frac < FRACUNIT && !ld->backsector)
@@ -595,6 +611,9 @@ boolean PIT_AddThingIntercepts(mobj_t * thing)
     frac = P_InterceptVector(&trace, &dl);
     if (frac < 0)
         return true;            // behind source
+
+    check_intercept();  // killough
+
     intercept_p->frac = frac;
     intercept_p->isaline = false;
     intercept_p->d.thing = thing;
