@@ -35,6 +35,8 @@
 
 #include "i_timer.h"
 
+#include "c_io.h"
+
 //extern void CheckAbortStartup(void);
 
 typedef struct
@@ -252,7 +254,7 @@ void R_GenerateLookup(int texnum)
     {
         if (!patchcount[x])
         {
-            printf("R_GenerateLookup: column without a patch (%s)\n",
+            C_Printf("R_GenerateLookup: column without a patch (%s)\n",
                    texture->name);
             return;
         }

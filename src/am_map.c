@@ -38,6 +38,8 @@
 #include "doomkeys.h"
 #include "v_video.h"
 
+#include "c_io.h"
+
 vertex_t KeyPoints[NUMKEYS];
 
 #define NUMALIAS 3              // Number of antialiased lines.
@@ -1127,7 +1129,7 @@ void AM_drawFline(fline_t * fl, int color)
                     || fl->b.x < 0 || fl->b.x >= f_w
                     || fl->b.y < 0 || fl->b.y >= f_h)
                 {
-                    fprintf(stderr, "fuck %d \r", fuck++);
+                    C_Printf("fuck %d \r", fuck++);
                     return;
                 }
 

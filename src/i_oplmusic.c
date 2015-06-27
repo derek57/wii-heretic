@@ -34,6 +34,8 @@
 #include "opl.h"
 #include "midifile.h"
 
+#include "c_io.h"
+
 // #define OPL_MIDI_DEBUG
 
 #define MAXMIDLENGTH (96 * 1024)
@@ -1422,7 +1424,7 @@ static void *I_OPL_RegisterSong(void *data, int len)
 
     if (result == NULL)
     {
-        fprintf(stderr, "I_OPL_RegisterSong: Failed to load MID.\n");
+        C_Printf("I_OPL_RegisterSong: Failed to load MID.\n");
     }
 
     // remove file now
@@ -1473,7 +1475,7 @@ static boolean I_OPL_MusicIsPlaying(void)
 
     if (!OPL_Init(opl_io_port))
     {
-        printf("Dude.  The Adlib isn't responding.\n");
+        C_Printf("Dude.  The Adlib isn't responding.\n");
         return false;
     }
 

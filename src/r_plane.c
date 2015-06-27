@@ -29,6 +29,8 @@
 #include "i_system.h"
 #include "r_local.h"
 
+#include "c_io.h"
+
 planefunction_t floorfunc, ceilingfunc;
 
 //
@@ -247,7 +249,7 @@ static void R_RaiseVisplanes (visplane_t** vp)
 	ceilingplane = visplanes + (ceilingplane - visplanes_old);
 
 	if (numvisplanes_old)
-	    printf("R_FindPlane: Hit MAXVISPLANES limit at %d, raised to %d.\n", numvisplanes_old, numvisplanes);
+	    C_Printf("R_FindPlane: Hit MAXVISPLANES limit at %d, raised to %d.\n", numvisplanes_old, numvisplanes);
 
 	// keep the pointer passed as argument in relation to the visplanes pointer
 	if (vp)

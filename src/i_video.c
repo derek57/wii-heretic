@@ -34,7 +34,6 @@
 #include "deh_str.h"
 #include "doomtype.h"
 #include "doomkeys.h"
-#include "i_glscale.h"
 #include "i_joystick.h"
 #include "i_system.h"
 #include "i_swap.h"
@@ -48,6 +47,8 @@
 #include "v_video.h"
 #include "w_wad.h"
 #include "z_zone.h"
+
+#include "c_io.h"
 
 #include <wiiuse/wpad.h>
 #include <wiilight.h>
@@ -256,7 +257,7 @@ boolean screenvisible;
 // If true, we are rendering the screen using OpenGL hardware scaling
 // rather than software mode.
 
-static boolean using_opengl = true;
+//static boolean using_opengl = false;
 
 // If true, we display dots at the bottom of the screen to 
 // indicate FPS.
@@ -1057,7 +1058,7 @@ void I_BeginRead(void)
                     + (SCREENWIDTH - LOADING_DISK_W);
     int y;
 */
-    if (!initialized /*|| disk_image == NULL*/ || using_opengl)
+    if (!initialized /*|| disk_image == NULL || using_opengl*/)
         return;
 
     // save background and copy the disk image in
@@ -1092,7 +1093,7 @@ void I_EndRead(void)
                     + (SCREENWIDTH - LOADING_DISK_W);
     int y;
 */
-    if (!initialized /*|| disk_image == NULL*/ || using_opengl)
+    if (!initialized /*|| disk_image == NULL || using_opengl*/)
         return;
 
     // save background and copy the disk image in
@@ -1201,13 +1202,14 @@ void I_FinishUpdate (void)
 	for ( ; i<20*4 ; i+=4)
 	    I_VideoBuffer[ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0x0;
     }
-
+/*
     if (using_opengl)
     {
         I_GL_UpdateScreen(I_VideoBuffer, palette);
         SDL_GL_SwapBuffers();
     }
     else
+*/
     {
         FinishUpdateSoftware();
     }
@@ -1364,7 +1366,7 @@ static screen_mode_t *I_FindScreenMode(int w, int h)
     // In OpenGL mode the rules are different. We can have any
     // resolution, though it needs to match the aspect ratio we
     // expect.
-
+/*
     if (using_opengl)
     {
         static screen_mode_t gl_mode;
@@ -1387,7 +1389,7 @@ static screen_mode_t *I_FindScreenMode(int w, int h)
 
         return &gl_mode;
     }
-
+*/
     // Special case: 320x200 and 640x400 are available even if aspect 
     // ratio correction is turned on.  These modes have non-square
     // pixels.
@@ -1507,10 +1509,10 @@ static boolean AutoAdjustFullscreen(void)
 
         return false;
     }
-/*
-    printf("I_InitGraphics: %ix%i mode not supported on this machine.\n",
+
+    C_Printf("I_InitGraphics: %ix%i mode not supported on this machine.\n",
            screen_width, screen_height);
-*/
+
     screen_width = best_mode->w;
     screen_height = best_mode->h;
 
@@ -1539,10 +1541,9 @@ static void AutoAdjustWindowed(void)
 
     if (best_mode->width != screen_width || best_mode->height != screen_height)
     {
-/*
-        printf("I_InitGraphics: Cannot run at specified mode: %ix%i\n",
+        C_Printf("I_InitGraphics: Cannot run at specified mode: %ix%i\n",
                screen_width, screen_height);
-*/
+
         screen_width = best_mode->width;
         screen_height = best_mode->height;
     }
@@ -1590,10 +1591,9 @@ static void AutoAdjustColorDepth(void)
 
     if (modes == NULL)
     {
-/*
-        printf("I_InitGraphics: %ibpp color depth not supported.\n",
+        C_Printf("I_InitGraphics: %ibpp color depth not supported.\n",
                screen_bpp);
-*/
+
         info = SDL_GetVideoInfo();
 
         if (info != NULL && info->vfmt != NULL)
@@ -1608,13 +1608,12 @@ static void AutoAdjustColorDepth(void)
 
 static void I_AutoAdjustSettings(void)
 {
-/*
     int old_screen_w, old_screen_h, old_screen_bpp;
 
     old_screen_w = screen_width;
     old_screen_h = screen_height;
     old_screen_bpp = screen_bpp;
-*/
+
     // Possibly adjust color depth.
 
     AutoAdjustColorDepth();
@@ -1635,19 +1634,14 @@ static void I_AutoAdjustSettings(void)
     }
 
     // Have the settings changed?  Show a message.
-/*
     if (screen_width != old_screen_w || screen_height != old_screen_h
      || screen_bpp != old_screen_bpp)
     {
-        printf("I_InitGraphics: Auto-adjusted to %ix%ix%ibpp.\n",
+        C_Printf("I_InitGraphics: Auto-adjusted to %ix%ix%ibpp.\n",
                screen_width, screen_height, screen_bpp);
 
-        printf("NOTE: Your video settings have been adjusted.  "
-               "To disable this behavior,\n"
-               "set autoadjust_video_settings to 0 in your "
-               "configuration file.\n");
+        C_Printf("NOTE: Your video settings have been adjusted.\n");
     }
-*/
 }
 
 // Set video size to a particular scale factor (1x, 2x, 3x, etc.)
@@ -1947,7 +1941,7 @@ static void SetWindowPositionVars(void)
         putenv(buf);
     }
 }
-
+*/
 static char *WindowBoxType(screen_mode_t *mode, int w, int h)
 {
     if (mode->width != w && mode->height != h) 
@@ -1967,7 +1961,7 @@ static char *WindowBoxType(screen_mode_t *mode, int w, int h)
         return "...";
     }
 }
-*/
+
 static void SetVideoMode(screen_mode_t *mode, int w, int h)
 {
     byte *doompal;
@@ -1978,14 +1972,14 @@ static void SetVideoMode(screen_mode_t *mode, int w, int h)
     // If we are already running and in a true color mode, we need
     // to free the screenbuffer surface before setting the new mode.
 
-    if (!using_opengl && screenbuffer != NULL && screen != screenbuffer)
+    if (/*!using_opengl &&*/ screenbuffer != NULL && screen != screenbuffer)
     {
         SDL_FreeSurface(screenbuffer);
     }
 
     // Perform screen scale setup before changing video mode.
 
-    if (!using_opengl && mode != NULL && mode->InitMode != NULL)
+    if (/*!using_opengl &&*/ mode != NULL && mode->InitMode != NULL)
     {
         mode->InitMode(doompal);
     }
@@ -2008,13 +2002,14 @@ static void SetVideoMode(screen_mode_t *mode, int w, int h)
             flags |= SDL_RESIZABLE;
         }
     }
-
+/*
     if (using_opengl)
     {
         flags |= SDL_OPENGL;
         screen_bpp = 32;
     }
     else
+*/
     {
         flags |= SDL_SWSURFACE | SDL_DOUBLEBUF;
 
@@ -2031,7 +2026,7 @@ static void SetVideoMode(screen_mode_t *mode, int w, int h)
         I_Error("Error setting video mode %ix%ix%ibpp: %s\n",
                 w, h, screen_bpp, SDL_GetError());
     }
-
+/*
     if (using_opengl)
     {
         // Try to initialize OpenGL scaling backend. This can fail,
@@ -2041,11 +2036,10 @@ static void SetVideoMode(screen_mode_t *mode, int w, int h)
 
         if (!I_GL_InitScale(screen->w, screen->h))
         {
-/*
             fprintf(stderr,
                     "Failed to initialize in OpenGL mode. "
                     "Falling back to software mode instead.\n");
-*/
+
             using_opengl = false;
 
             // TODO: This leaves us in window with borders around it.
@@ -2056,6 +2050,7 @@ static void SetVideoMode(screen_mode_t *mode, int w, int h)
         }
     }
     else
+*/
     {
         // Blank out the full screen area in case there is any junk in
         // the borders that won't otherwise be overwritten.
@@ -2182,7 +2177,7 @@ void I_InitGraphics(void)
 
     // If we're using OpenGL, call the preinit function now; if it fails
     // then we have to fall back to software mode.
-
+/*
     if (using_opengl && !I_GL_PreInit())
     {
         using_opengl = false;
@@ -2194,7 +2189,7 @@ void I_InitGraphics(void)
     // When in screensaver mode, run full screen and auto detect
     // screen dimensions (don't change video mode)
     //
-/*
+
     if (screensaver_mode)
     {
         SetVideoMode(NULL, 0, 0);
@@ -2212,6 +2207,14 @@ void I_InitGraphics(void)
         w = screen_width;
         h = screen_height;
 
+        C_Printf(" Scaling to aspect ratio 16:9 in software mode\n");
+        C_Printf(" Using 256-color palette from PLAYPAL lump.\n");
+
+        if(!usegamma)
+            C_Printf(" Gamma correction is off.\n");
+        else
+            C_Printf(" Gamma correction is enabled.\n");
+
         screen_mode = I_FindScreenMode(w, h);
 
         if (screen_mode == NULL)
@@ -2219,14 +2222,14 @@ void I_InitGraphics(void)
             I_Error("I_InitGraphics: Unable to find a screen mode small "
                     "enough for %ix%i", w, h);
         }
-/*
+
         if (w != screen_mode->width || h != screen_mode->height)
         {
-            printf("I_InitGraphics: %s (%ix%i within %ix%i)\n",
+            C_Printf("I_InitGraphics: %s (%ix%i within %ix%i)\n",
                    WindowBoxType(screen_mode, w, h),
                    screen_mode->width, screen_mode->height, w, h);
         }
-*/
+
         SetVideoMode(screen_mode, w, h);
     }
 
@@ -2235,7 +2238,7 @@ void I_InitGraphics(void)
     doompal = W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE);
     I_SetPalette(doompal);
 
-    if (!using_opengl)
+//    if (!using_opengl)
     {
         SDL_SetColors(screenbuffer, palette, 0, 256);
 
@@ -2265,8 +2268,8 @@ void I_InitGraphics(void)
     // Likewise if the screen pitch is not the same as the width
     // If we have to multiply, drawing is done to a separate 320x200 buf
 
-    native_surface = !using_opengl
-                  && screen == screenbuffer
+    native_surface = /*!using_opengl
+                  &&*/ screen == screenbuffer
                   && !SDL_MUSTLOCK(screen)
                   && screen_mode == &mode_scale_1x
                   && screen->pitch == SCREENWIDTH

@@ -22,6 +22,8 @@
 
 #include "opl_queue.h"
 
+#include "c_io.h"
+
 #define MAX_OPL_QUEUE 64
 
 typedef struct
@@ -71,7 +73,7 @@ void OPL_Queue_Push(opl_callback_queue_t *queue,
 
     if (queue->num_entries >= MAX_OPL_QUEUE)
     {
-        fprintf(stderr, "OPL_Queue_Push: Exceeded maximum callbacks\n");
+        C_Printf("OPL_Queue_Push: Exceeded maximum callbacks\n");
         return;
     }
 
@@ -229,10 +231,10 @@ static void PrintQueueNode(opl_callback_queue_t *queue, int node, int depth)
 
     for (i=0; i<depth * 3; ++i)
     {
-        printf(" ");
+        C_Printf(" ");
     }
 
-    printf("%i\n", queue->entries[node].time);
+    C_Printf("%i\n", queue->entries[node].time);
 
     PrintQueueNode(queue, node * 2 + 1, depth + 1);
     PrintQueueNode(queue, node * 2 + 2, depth + 1);

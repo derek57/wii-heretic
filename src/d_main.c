@@ -1211,12 +1211,21 @@ void D_DoomMain(void)
 
     printf("DPMI memory: 0x3c9e000, 0x800000 allocated for zone\n");
 
+    C_Printf("C:\\HERETIC>HERETIC.EXE_\n");
+    C_Printf("DOS/4GW Professional Protected Mode Run-time  Version 1.97\n");
+    C_Printf("Copyright (c) Rational Systems, Inc. 1990-1994\n");    
+    C_Printf("V_Init: allocate screens.\n");
+    C_Printf("M_LoadDefaults: Load system defaults.\n");
+    C_Printf("Z_Init: Init zone memory allocation daemon.\n");
+    C_Printf("DPMI memory: 0x3c9e000, 0x800000 allocated for zone\n");
+
 #ifdef FEATURE_DEHACKED
 //    printf("DEH_Init: Init Dehacked support.\n");
     DEH_Init();
 #endif
 
     DEH_printf("W_Init: Init WADfiles.\n");
+    C_Printf("W_Init: Init WADfiles.\n");
 /*
     iwadfile = D_FindIWAD(IWAD_MASK_HERETIC, &gamemission);
 
@@ -1242,7 +1251,10 @@ void D_DoomMain(void)
 	D_AddFile("sd:/apps/wiiheretic/pspheretic.wad");
 
     if (debugmode && (HERETIC_REG_1_0 || HERETIC_REG_1_2 || HERETIC_REG_1_3))
+    {
 	printf("  adding pspheretic.wad\n");
+	C_Printf("  adding pspheretic.wad\n");
+    }
 
     if ((HERETIC_REG_1_0 || HERETIC_REG_1_2 || HERETIC_REG_1_3) && load_extra_wad == 1)
     {
@@ -1378,6 +1390,7 @@ void D_DoomMain(void)
 	DEH_printf("R_Init: Init Heretic refresh daemon.");
 */
 	printf("Loading graphics");
+	C_Printf("Loading graphics");
 //    hprintf(DEH_String("Loading graphics"));
 
     R_Init();
@@ -1394,6 +1407,7 @@ void D_DoomMain(void)
 //    IncThermo();
 
     DEH_printf("I_Init: Setting up machine state.\n");
+    C_Printf("I_Init: Setting up machine state.\n");
 /*
     I_CheckIsScreensaver();
     I_InitJoystick();
@@ -1413,6 +1427,7 @@ void D_DoomMain(void)
     S_Start();
 
     DEH_printf("Checking network game status.\n");
+    C_Printf("Checking network game status.\n");
 /*
     hprintf(DEH_String("Checking network game status."));
     printf("Checking network game status.");

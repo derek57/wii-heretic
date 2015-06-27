@@ -59,6 +59,8 @@
 
 #include "doomdef.h"
 
+#include "c_io.h"
+
 #ifdef __MACOSX__
 #include <CoreFoundation/CFUserNotification.h>
 #endif
@@ -206,8 +208,8 @@ void I_PrintStartupBanner(char *gamedescription)
     I_PrintBanner(gamedescription);
     I_PrintDivider();
     
-    printf(
-    " " PACKAGE_NAME " is free software, covered by the GNU General Public\n"
+    C_Printf(
+    " Wii-HERETIC is free software, covered by the GNU General Public\n"
     " License.  There is NO warranty; not even for MERCHANTABILITY or FITNESS\n"
     " FOR A PARTICULAR PURPOSE. You are welcome to change and distribute\n"
     " copies under certain conditions. See the source for more information.\n");
@@ -316,7 +318,7 @@ void I_Error (char *error, ...)
 
     if (already_quitting)
     {
-        fprintf(stderr, "Warning: recursive call to I_Error detected.\n");
+        C_Printf("Warning: recursive call to I_Error detected.\n");
 //        exit(-1);
 
 	error_detected = true;

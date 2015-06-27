@@ -713,15 +713,14 @@ static void LoadSubstituteConfigs(void)
             free(path);
         }
     }
-/*
-    free(musicdir);
+
+//    free(musicdir);
 
     if (subst_music_len > 0)
     {
         C_Printf("Loaded %i music substitutions from\n config files.\n\n",
                subst_music_len);
     }
-*/
 }
 
 // Returns true if the given lump number is a music lump that should
@@ -801,11 +800,10 @@ static void DumpSubstituteConfig(char *filename)
 
     fprintf(fs, "\n");
     fclose(fs);
-/*
+
     C_Printf("SUBSTITUTE MIDI CONFIG FILE WRITTEN TO %s.\n", filename);
 
-    I_Quit();
-*/
+//    I_Quit();
 }
 
 // If the temp_timidity_cfg config variable is set, generate a "wrapper"
@@ -990,10 +988,9 @@ static boolean I_SDL_InitMusic(void)
         }
         else if (Mix_OpenAudio(snd_samplerate, AUDIO_S16SYS, 2, 4096) < 0)
         {
-/*
-            fprintf(stderr, "Error initializing SDL_mixer: %s\n",
+            C_Printf("Error initializing SDL_mixer: %s\n",
                     Mix_GetError());
-*/
+
 	    C_Printf("COULDN'T OPEN AUDIO WITH DESIRED FORMAT\n");
 
             SDL_QuitSubSystem(SDL_INIT_AUDIO);

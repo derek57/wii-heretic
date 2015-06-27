@@ -39,6 +39,8 @@
 
 #include "m_argv.h"
 #include "m_fixed.h"
+
+#include "c_io.h"
 /*
 #include "net_client.h"
 #include "net_gui.h"
@@ -272,7 +274,7 @@ static void D_Disconnected(void)
 */
     // disconnected from server
 
-    printf("Disconnected from server.\n");
+    C_Printf("Disconnected from server.\n");
 }
 
 //
@@ -433,7 +435,7 @@ void D_StartNetGame(net_gamesettings_t *settings,
 
     if (!new_sync)
     {
-	printf("Syncing netgames like Vanilla Doom.\n");
+	C_Printf("Syncing netgames like Vanilla Doom.\n");
     }
 }
 /*
