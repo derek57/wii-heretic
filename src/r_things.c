@@ -256,9 +256,9 @@ void R_InitSpriteDefs(char **namelist)
 ===============================================================================
 */
 
-vissprite_t *vissprites = NULL;
+vissprite_t *vissprites = NULL, **vissprite_ptrs;          // killough;
 vissprite_t *vissprite_p;
-static int  numvissprites;
+static int  num_vissprite, num_vissprite_alloc, num_vissprite_ptrs;
 int newvissprite;
 
 
@@ -295,7 +295,7 @@ void R_InitSprites(char **namelist)
 
 void R_ClearSprites(void)
 {
-    vissprite_p = vissprites;
+    num_vissprite = 0;          // killough
 }
 
 
@@ -311,33 +311,29 @@ vissprite_t overflowsprite;
 
 vissprite_t *R_NewVisSprite(void)
 {
-    // remove MAXVISSPRITE Vanilla limit
-    if (vissprite_p == &vissprites[numvissprites])
+    if (num_vissprite >= num_vissprite_alloc)           // killough
     {
-	static int max;
-	int numvissprites_old = numvissprites;
+        static int max;
+        int numvissprites_old = num_vissprite_alloc;
 
-	// cap MAXVISSPRITES limit at 4096
-	if (!max && numvissprites == 32 * MAXVISSPRITES)
-	{
-	    C_Printf("R_NewVisSprite: MAXVISSPRITES limit capped at %d.\n", numvissprites);
-	    max++;
-	}
+        // cap MAXVISSPRITES limit at 4096
+        if (!max && num_vissprite_alloc == 32 * 128)
+        {
+            C_Printf(" R_NewVisSprite: MAXVISSPRITES limit capped at %d.\n", num_vissprite_alloc);
+            max++;
+        }
 
-	if (max)
-	return &overflowsprite;
+        if (max)
+            return &overflowsprite;
 
-	numvissprites = numvissprites ? 2 * numvissprites : MAXVISSPRITES;
-	vissprites = realloc(vissprites, numvissprites * sizeof(*vissprites));
-	memset(vissprites + numvissprites_old, 0, (numvissprites - numvissprites_old) * sizeof(*vissprites));
+        num_vissprite_alloc = (num_vissprite_alloc ? num_vissprite_alloc * 2 : 128);
+        vissprites = realloc(vissprites, num_vissprite_alloc * sizeof(*vissprites));
+        memset(vissprites + numvissprites_old, 0, (num_vissprite_alloc - numvissprites_old) * sizeof(*vissprites));
 
-	vissprite_p = vissprites + numvissprites_old;
-
-	if (numvissprites_old)
-	    C_Printf("R_NewVisSprite: Hit MAXVISSPRITES limit at %d, raised to %d.\n", numvissprites_old, numvissprites);
+        if (numvissprites_old)
+            C_Printf(" R_NewVisSprite: Hit MAXVISSPRITES limit at %d, raised to %d.\n", numvissprites_old, num_vissprite_alloc);
     }
-    vissprite_p++;
-    return vissprite_p - 1;
+    return (vissprites + num_vissprite++);
 }
 
 
@@ -868,51 +864,77 @@ void R_DrawPlayerSprites(void)
 
 vissprite_t vsprsortedhead;
 
-void R_SortVisSprites(void)
+#define bcopyp(d, s, n) memcpy(d, s, (n) * sizeof(void *))
+
+// killough 9/2/98: merge sort
+static void msort(vissprite_t **s, vissprite_t **t, int n)
 {
-    int i, count;
-    vissprite_t *ds, *best;
-    vissprite_t unsorted;
-    fixed_t bestscale;
-
-    count = vissprite_p - vissprites;
-
-    unsorted.next = unsorted.prev = &unsorted;
-    if (!count)
-        return;
-
-    for (ds = vissprites; ds < vissprite_p; ds++)
+    if (n >= 16)
     {
-        ds->next = ds + 1;
-        ds->prev = ds - 1;
+        int             n1 = n / 2;
+        int             n2 = n - n1;
+        vissprite_t     **s1 = s;
+        vissprite_t     **s2 = s + n1;
+        vissprite_t     **d = t;
+
+        msort(s1, t, n1);
+        msort(s2, t, n2);
+
+        while ((*s1)->scale > (*s2)->scale ? (*d++ = *s1++, --n1) : (*d++ = *s2++, --n2));
+
+        if (n2)
+            bcopyp(d, s2, n2);
+        else
+            bcopyp(d, s1, n1);
+
+        bcopyp(s, t, n);
     }
-    vissprites[0].prev = &unsorted;
-    unsorted.next = &vissprites[0];
-    (vissprite_p - 1)->next = &unsorted;
-    unsorted.prev = vissprite_p - 1;
-
-//
-// pull the vissprites out by scale
-//
-    best = 0;                   // shut up the compiler warning
-    vsprsortedhead.next = vsprsortedhead.prev = &vsprsortedhead;
-    for (i = 0; i < count; i++)
+    else
     {
-        bestscale = INT_MAX;
-        for (ds = unsorted.next; ds != &unsorted; ds = ds->next)
+        int     i;
+
+        for (i = 1; i < n; i++)
         {
-            if (ds->scale < bestscale)
+            vissprite_t *temp = s[i];
+
+            if (s[i - 1]->scale < temp->scale)
             {
-                bestscale = ds->scale;
-                best = ds;
+                int     j = i;
+
+                while ((s[j] = s[j - 1])->scale < temp->scale && --j);
+                s[j] = temp;
             }
         }
-        best->next->prev = best->prev;
-        best->prev->next = best->next;
-        best->next = &vsprsortedhead;
-        best->prev = vsprsortedhead.prev;
-        vsprsortedhead.prev->next = best;
-        vsprsortedhead.prev = best;
+    }
+}
+
+void R_SortVisSprites(void)
+{
+    if (num_vissprite)
+    {
+        int     i;
+
+        // If we need to allocate more pointers for the vissprites,
+        // allocate as many as were allocated for sprites -- killough
+        // killough 9/22/98: allocate twice as many
+        if (num_vissprite_ptrs < num_vissprite * 2)
+        {
+            free(vissprite_ptrs);
+            vissprite_ptrs = (vissprite_t **)malloc((num_vissprite_ptrs = num_vissprite_alloc * 2)
+                * sizeof(*vissprite_ptrs));
+        }
+
+        for (i = num_vissprite; --i >= 0;)
+        {
+            vissprite_t     *spr = vissprites + i;
+
+            spr->drawn = false;
+            vissprite_ptrs[i] = spr;
+        }
+
+        // killough 9/22/98: replace qsort with merge sort, since the keys
+        // are roughly in order to begin with, due to BSP rendering.
+        msort(vissprite_ptrs, vissprite_ptrs + num_vissprite, num_vissprite);
     }
 }
 
@@ -1040,17 +1062,18 @@ void R_DrawSprite(vissprite_t * spr)
 
 void R_DrawMasked(void)
 {
-    vissprite_t *spr;
+    int                i;
+
     drawseg_t *ds;
 
     R_SortVisSprites();
 
-    if (vissprite_p > vissprites)
+    // draw all other vissprites, back to front
+    for (i = num_vissprite; --i >= 0;)
     {
-        // draw all vissprites back to front
+        vissprite_t     *spr = vissprite_ptrs[i];
 
-        for (spr = vsprsortedhead.next; spr != &vsprsortedhead;
-             spr = spr->next)
+        if (!spr->drawn)
             R_DrawSprite(spr);
     }
 
