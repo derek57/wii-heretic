@@ -562,11 +562,8 @@ Events are operations triggered by using, crossing, or shooting special lines, o
 ===============================================================================
 */
 
-void P_CrossSpecialLine(int linenum, int side, mobj_t * thing)
+void P_CrossSpecialLine(line_t *line, int side, mobj_t *thing)
 {
-    line_t *line;
-
-    line = &lines[linenum];
     if (!thing->player)
     {                           // Check if trigger allowed by non-player mobj
         switch (line->special)

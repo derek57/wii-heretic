@@ -256,13 +256,12 @@ fixed_t yspeed[8] =
     { 0, 47000, FRACUNIT, 47000, 0, -47000, -FRACUNIT, -47000 };
 
 #define	MAXSPECIALCROSS		8
-extern line_t *spechit[MAXSPECIALCROSS];
+extern line_t **spechit;
 extern int numspechit;
 
 boolean P_Move(mobj_t * actor)
 {
     fixed_t tryx, tryy;
-    line_t *ld;
     boolean good;
 
     if (actor->movedir == DI_NODIR)
@@ -291,17 +290,27 @@ boolean P_Move(mobj_t * actor)
             return false;
         }
         actor->movedir = DI_NODIR;
-        good = false;
-        while (numspechit--)
-        {
-            ld = spechit[numspechit];
-            // if the special isn't a door that can be opened, return false
-            if (P_UseSpecialLine(actor, ld))
-            {
-                good = true;
-            }
-        }
-        return (good);
+
+        // if the special is not a door that can be opened, return false
+        //
+        // killough 8/9/98: this is what caused monsters to get stuck in
+        // doortracks, because it thought that the monster freed itself
+        // by opening a door, even if it was moving towards the doortrack,
+        // and not the door itself.
+        //
+        // killough 9/9/98: If a line blocking the monster is activated,
+        // return true 90% of the time. If a line blocking the monster is
+        // not activated, but some other line is, return false 90% of the
+        // time. A bit of randomness is needed to ensure it's free from
+        // lockups, but for most cases, it returns the correct result.
+        //
+        // Do NOT simply return false 1/4th of the time (causes monsters to
+        // back out when they shouldn't, and creates secondary stickiness).
+        for (good = false; numspechit--;)
+            if (P_UseSpecialLine(actor, spechit[numspechit]))
+                good |= (spechit[numspechit] == blockline ? 1 : 2);
+
+        return (good && ((P_Random() >= 230) ^ (good & 1)));
     }
     else
     {

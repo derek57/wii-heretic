@@ -106,12 +106,14 @@ fixed_t tmfloorz, tmceilingz, tmdropoffz;
 // keep track of the line that lowers the ceiling, so missiles don't explode
 // against sky hack walls
 line_t *ceilingline;
+line_t *blockline;
 
 // keep track of special lines as they are hit, but don't process them
 // until the move is proven valid
 #define	MAXSPECIALCROSS		8
-line_t *spechit[MAXSPECIALCROSS];
+line_t **spechit;
 int numspechit;
+static int spechit_max;
 
 mobj_t *onmobj;                 //generic global onmobj...used for landing on pods/players
 
@@ -272,10 +274,10 @@ boolean PIT_CheckLine(line_t * ld)
         {                       // Missiles can trigger impact specials
             if (ld->special)
             {
-                spechit[numspechit] = ld;
-                numspechit++;
+                spechit[numspechit++] = ld;
             }
         }
+        blockline = ld;
         return false;
     }
     if (!(tmthing->flags & MF_MISSILE))
@@ -296,10 +298,12 @@ boolean PIT_CheckLine(line_t * ld)
     {
         tmceilingz = opentop;
         ceilingline = ld;
+        blockline = ld;
     }
     if (openbottom > tmfloorz)
     {
         tmfloorz = openbottom;
+        blockline = ld;
     }
     if (lowfloor < tmdropoffz)
     {
@@ -307,8 +311,13 @@ boolean PIT_CheckLine(line_t * ld)
     }
     if (ld->special)
     {                           // Contacted a special line, add it to the list
-        spechit[numspechit] = ld;
-        numspechit++;
+        // 1/11/98 killough: remove limit on lines hit, by array doubling
+        if (numspechit >= spechit_max)
+        {
+            spechit_max = (spechit_max ? spechit_max * 2 : 8);
+            spechit = realloc(spechit, sizeof(*spechit) * spechit_max);
+        }
+        spechit[numspechit++] = ld;
     }
     return (true);
 }
@@ -564,7 +573,7 @@ boolean P_CheckPosition(mobj_t * thing, fixed_t x, fixed_t y)
     tmbbox[BOXLEFT] = x - tmthing->radius;
 
     newsubsec = R_PointInSubsector(x, y);
-    ceilingline = NULL;
+    blockline = ceilingline = NULL;
 
 //
 // the base floor / ceiling is from the subsector that contains the
@@ -796,8 +805,6 @@ void CheckMissileImpact(mobj_t * mobj)
 boolean P_TryMove(mobj_t * thing, fixed_t x, fixed_t y)
 {
     fixed_t oldx, oldy;
-    int side, oldside;
-    line_t *ld;
 
     floatok = false;
     if (!P_CheckPosition(thing, x, y))
@@ -884,14 +891,11 @@ boolean P_TryMove(mobj_t * thing, fixed_t x, fixed_t y)
         while (numspechit--)
         {
             // see if the line was crossed
-            ld = spechit[numspechit];
-            side = P_PointOnLineSide(thing->x, thing->y, ld);
-            oldside = P_PointOnLineSide(oldx, oldy, ld);
-            if (side != oldside)
-            {
-                if (ld->special)
-                    P_CrossSpecialLine(ld - lines, oldside, thing);
-            }
+            line_t      *ld = spechit[numspechit];
+            int         oldside = P_PointOnLineSide(oldx, oldy, ld);
+
+            if (oldside != P_PointOnLineSide(thing->x, thing->y, ld) && ld->special)
+                P_CrossSpecialLine(ld, oldside, thing);
         }
 
     return true;
