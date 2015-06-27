@@ -238,21 +238,30 @@ typedef struct
     boolean crush;
     int tag;
     plattype_e type;
+    struct platlist_s  *list;   // killough
 } plat_t;
+
+// New limit-free plat structure -- killough
+typedef struct platlist_s
+{
+    plat_t             *plat;
+    struct platlist_s  *next, **prev;
+} platlist_t;
 
 #define	PLATWAIT	3
 #define	PLATSPEED	FRACUNIT
 //#define MAXPLATS		30				// CHANGED FOR HIRES
 #define MAXPLATS		30*256				// CHANGED FOR HIRES
 
-extern plat_t *activeplats[MAXPLATS];
+extern platlist_t *activeplats;
 
 void T_PlatRaise(plat_t * plat);
 int EV_DoPlat(line_t * line, plattype_e type, int amount);
 void P_AddActivePlat(plat_t * plat);
 void P_RemoveActivePlat(plat_t * plat);
-void EV_StopPlat(line_t * line);
+boolean EV_StopPlat(line_t * line);
 void P_ActivateInStasis(int tag);
+void P_RemoveAllActivePlats(void);
 
 /*
 ===============================================================================

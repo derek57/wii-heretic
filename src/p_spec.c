@@ -1198,9 +1198,8 @@ void P_SpawnSpecials(void)
     //
 
     P_RemoveAllActiveCeilings();
+    P_RemoveAllActivePlats();
 
-    for (i = 0; i < MAXPLATS; i++)
-        activeplats[i] = NULL;
     for (i = 0; i < MAXBUTTONS; i++)
         memset(&buttonlist[i], 0, sizeof(button_t));
 }
