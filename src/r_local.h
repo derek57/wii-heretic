@@ -457,7 +457,8 @@ void R_PrecacheLevel(void);
 //#define MAXVISSPRITES  	128				// CHANGED FOR HIRES
 #define MAXVISSPRITES  	128*8					// CHANGED FOR HIRES
 
-extern vissprite_t vissprites[MAXVISSPRITES], *vissprite_p;
+extern vissprite_t *vissprites;
+extern vissprite_t *vissprite_p;
 extern vissprite_t vsprsortedhead;
 
 // constant arrays used for psprite clipping and initializing clipping

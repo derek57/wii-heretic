@@ -30,6 +30,8 @@
 #include "i_system.h"
 #include "r_local.h"
 
+#include "c_io.h"
+
 typedef struct
 {
     int x1, x2;
@@ -254,7 +256,9 @@ void R_InitSpriteDefs(char **namelist)
 ===============================================================================
 */
 
-vissprite_t vissprites[MAXVISSPRITES], *vissprite_p;
+vissprite_t *vissprites = NULL;
+vissprite_t *vissprite_p;
+static int  numvissprites;
 int newvissprite;
 
 
@@ -307,8 +311,31 @@ vissprite_t overflowsprite;
 
 vissprite_t *R_NewVisSprite(void)
 {
-    if (vissprite_p == &vissprites[MAXVISSPRITES])
-        return &overflowsprite;
+    // remove MAXVISSPRITE Vanilla limit
+    if (vissprite_p == &vissprites[numvissprites])
+    {
+	static int max;
+	int numvissprites_old = numvissprites;
+
+	// cap MAXVISSPRITES limit at 4096
+	if (!max && numvissprites == 32 * MAXVISSPRITES)
+	{
+	    C_Printf("R_NewVisSprite: MAXVISSPRITES limit capped at %d.\n", numvissprites);
+	    max++;
+	}
+
+	if (max)
+	return &overflowsprite;
+
+	numvissprites = numvissprites ? 2 * numvissprites : MAXVISSPRITES;
+	vissprites = realloc(vissprites, numvissprites * sizeof(*vissprites));
+	memset(vissprites + numvissprites_old, 0, (numvissprites - numvissprites_old) * sizeof(*vissprites));
+
+	vissprite_p = vissprites + numvissprites_old;
+
+	if (numvissprites_old)
+	    C_Printf("R_NewVisSprite: Hit MAXVISSPRITES limit at %d, raised to %d.\n", numvissprites_old, numvissprites);
+    }
     vissprite_p++;
     return vissprite_p - 1;
 }
