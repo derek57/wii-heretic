@@ -56,8 +56,9 @@ static int		numvisplanes;				// ADDED FOR HIRES
 short			openings[MAXOPENINGS];			// CHANGED FOR HIRES
 short*			lastopening;				// CHANGED FOR HIRES
 */
-int			openings[MAXOPENINGS];			// CHANGED FOR HIRES
+int			*openings;				// CHANGED FOR HIRES
 int*			lastopening;				// CHANGED FOR HIRES
+size_t                  maxopenings;
 
 //
 // clip values are the solid pixel bounding the range

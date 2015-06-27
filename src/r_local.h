@@ -389,7 +389,7 @@ extern int skyflatnum;
 extern short			openings[MAXOPENINGS];			// CHANGED FOR HIRES
 extern short*			lastopening;				// CHANGED FOR HIRES
 */
-extern int			openings[MAXOPENINGS];			// CHANGED FOR HIRES
+extern int			*openings;				// CHANGED FOR HIRES
 extern int*			lastopening;				// CHANGED FOR HIRES
 
 /*
@@ -476,6 +476,8 @@ extern short*		mceilingclip;			// CHANGED FOR HIRES
 */
 extern int*		mfloorclip;			// CHANGED FOR HIRES
 extern int*		mceilingclip;			// CHANGED FOR HIRES
+
+extern unsigned int     maxdrawsegs;
 
 extern fixed_t spryscale;
 extern fixed_t sprtopscreen;

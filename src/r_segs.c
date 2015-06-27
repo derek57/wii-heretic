@@ -333,6 +333,46 @@ void R_RenderSegLoop(void)
 }
 
 
+extern int *openings;
+extern size_t maxopenings;
+
+//
+// R_AdjustOpenings
+//
+// killough 1/6/98, 2/1/98: remove limit on openings
+// [SL] 2012-01-21 - Moved into its own function
+static void R_AdjustOpenings(int start, int stop)
+{
+    ptrdiff_t pos = lastopening - openings;
+    size_t need = (rw_stopx - start)*4 + pos;
+
+    if (need > maxopenings)
+    {
+        drawseg_t *ds;
+        int *oldopenings = openings;
+        int *oldlast = lastopening;
+
+        do
+            maxopenings = maxopenings ? maxopenings*2 : 16384;
+        while (need > maxopenings);
+        
+        openings = (int *)realloc (openings, maxopenings * sizeof(*openings));
+        lastopening = openings + pos;
+        C_Printf ("MaxOpenings increased to %u\n", maxopenings);
+
+        // [RH] We also need to adjust the openings pointers that
+        //        were already stored in drawsegs.
+        for (ds = drawsegs; ds < ds_p; ds++) {
+#define ADJUST(p) if (ds->p + ds->x1 >= oldopenings && ds->p + ds->x1 <= oldlast)\
+                  ds->p = ds->p - oldopenings + openings;
+            ADJUST (maskedtexturecol);
+            ADJUST (sprtopclip);
+            ADJUST (sprbottomclip);
+        }
+#undef ADJUST
+    }
+}
+
 
 /*
 =====================
@@ -399,6 +439,9 @@ void R_StoreWallRange(int start, int stop)
     ds_p->x2 = stop;
     ds_p->curline = curline;
     rw_stopx = stop + 1;
+
+    // killough: remove limits on openings
+    R_AdjustOpenings(start, stop);
 
 //
 // calculate scale at both ends and step
