@@ -1,8 +1,6 @@
-// Emacs style mode select   -*- C++ -*- 
-//-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
-// Copyright(C) 2005 Simon Howard
+// Copyright(C) 2005-2014 Simon Howard
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -14,28 +12,33 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-// 02111-1307, USA.
-//
 // DESCRIPTION:
-//        Simple basic typedefs, isolated here to make it easier
-//         separating modules.
+//	Simple basic typedefs, isolated here to make it easier
+//	 separating modules.
 //    
-//-----------------------------------------------------------------------------
 
 
 #ifndef __DOOMTYPE__
 #define __DOOMTYPE__
 
-
-#include <strings.h>
-
+#if defined(_MSC_VER) && !defined(__cplusplus)
+#define inline __inline
+#endif
 
 // #define macros to provide functions missing in Windows.
 // Outside Windows, we use strings.h for str[n]casecmp.
 
+/*
+#ifdef _WIN32
+
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+
+#else
+*/
+#include <strings.h>
+
+//#endif
 
 
 //
@@ -49,8 +52,10 @@
 
 #ifdef __GNUC__
 #define PACKEDATTR __attribute__((packed))
+/*
 #else
 #define PACKEDATTR
+*/
 #endif
 
 // C99 integer types; with gcc we just use this.  Other compilers 
@@ -83,23 +88,21 @@ typedef enum
 */
 typedef uint8_t byte;
 
-typedef struct {
-  byte checksum;       // Simple checksum of the entire packet
-  byte type;           /* Type of packet */
-  byte reserved[2];        /* Was random in prboom <=2.2.4, now 0 */
-  unsigned int tic;        // Timestamp
-} PACKEDATTR packet_header_t;
-
-typedef unsigned long ULONG;
-typedef unsigned short USHORT;
-
-#define INT64  long long
-
 #include <limits.h>
+/*
+#ifdef _WIN32
 
+#define DIR_SEPARATOR '\\'
+#define DIR_SEPARATOR_S "\\"
+#define PATH_SEPARATOR ';'
+
+#else
+*/
 #define DIR_SEPARATOR '/'
 #define DIR_SEPARATOR_S "/"
 #define PATH_SEPARATOR ':'
+
+//#endif
 
 #define arrlen(array) (sizeof(array) / sizeof(*array))
 
