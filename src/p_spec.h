@@ -319,20 +319,28 @@ typedef struct
     int direction;              // 1 = up, 0 = waiting, -1 = down
     int tag;                    // ID
     int olddirection;
+    struct ceilinglist_s        *list;  // jff 2/22/98 copied from killough's plats
 } ceiling_t;
+
+typedef struct ceilinglist_s
+{
+    ceiling_t                   *ceiling;
+    struct ceilinglist_s        *next, **prev;
+} ceilinglist_t;
 
 #define	CEILSPEED		FRACUNIT
 #define	CEILWAIT		150
 #define MAXCEILINGS		30
 
-extern ceiling_t *activeceilings[MAXCEILINGS];
+extern ceilinglist_t* activeceilings;
 
 int EV_DoCeiling(line_t * line, ceiling_e type);
 void T_MoveCeiling(ceiling_t * ceiling);
 void P_AddActiveCeiling(ceiling_t * c);
 void P_RemoveActiveCeiling(ceiling_t * c);
-int EV_CeilingCrushStop(line_t * line);
-void P_ActivateInStasisCeiling(line_t * line);
+boolean EV_CeilingCrushStop(line_t * line);
+boolean P_ActivateInStasisCeiling(line_t * line);
+void P_RemoveAllActiveCeilings(void);
 
 /*
 ===============================================================================
