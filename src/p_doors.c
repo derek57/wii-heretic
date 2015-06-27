@@ -265,6 +265,13 @@ void EV_VerticalDoor(line_t * line, mobj_t * thing)
             break;
     }
 
+    // if the wrong side of door is pushed, give oof sound
+    if (line->sidenum[1] == NO_INDEX)           // killough
+    {
+        S_StartSound(player->mo, sfx_plroof);    // killough 3/20/98
+        return;
+    }
+
     // if the sector has an active thinker, use it
     sec = sides[line->sidenum[side ^ 1]].sector;
     if (sec->specialdata)

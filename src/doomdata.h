@@ -194,7 +194,7 @@ typedef struct
 ===============================================================================
 */
 
-
+#define NO_INDEX ((unsigned short)(-1))
 
 
 #endif // __DOOMDATA__
